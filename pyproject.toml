@@ -1,0 +1,16 @@
+[project]
+name = "em-database"
+version = "0.1.0"
+description = "A database for electron microscopy data using pooch to download and manage files."
+requires-python = ">=3.12"
+dependencies = [
+    "pooch",
+    "pytest>=9.0.2",
+    "pyyaml",
+]
+keywords = [
+    "electron microscopy",
+    "database",
+    "materials science",
+]
+optional-dependencies = { tests = ["pytest", "pytest-cov"], doc = ["sphinx", "sphinx-rtd-theme"] }

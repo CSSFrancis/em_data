@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/em-dataset.collection.schema.json",
+  "title": "EM Dataset Collection",
+  "type": "object",
+  "patternProperties": {
+    "^.+$": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "format": "uri"
+        },
+        "checksum": {
+          "type": "string",
+          "pattern": "^md5:[A-Fa-f0-9]{32}$"
+        },
+        "file": {
+          "type": "string"
+        },
+        "data_size": {
+          "type": "string"
+        },
+        "detector_manufacturer": {
+          "type": "string",
+          "options": {
+            "enum": [
+              "Gatan",
+              "Thermo Fisher Scientific",
+              "Direct Electron",
+              "Dectris",
+              "Quantum Detectors",
+              "TVIPS",
+              "Other"
+            ]
+          }
+        },
+        "detector": {
+          "type": "string"
+        },
+        "microscope_vendor": {
+          "type": "string",
+          "enum": [
+            "Thermo Fisher Scientific",
+            "JEOL",
+            "Hitachi",
+            "Zeiss",
+            "Other"
+          ]
+        },
+        "microscope_model": {
+          "type": "string"
+        },
+        "camera_length": {
+          "type": "string"
+        },
+        "folder": {
+          "type": "string"
+        },
+        "voltage": {
+          "type": "string",
+          "pattern": "^[0-9]+\\s?kV$"
+        },
+        "license": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "authors": {
+          "type": "object",
+          "patternProperties": {
+            "^.+$": {
+              "type": "object",
+              "properties": {
+                "affiliation": {
+                  "type": "string"
+                },
+                "orcid": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{4}-\\d{4}-\\d{4}$"
+                }
+              },
+              "required": [
+                "affiliation"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "description",
+        "source",
+        "file"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
