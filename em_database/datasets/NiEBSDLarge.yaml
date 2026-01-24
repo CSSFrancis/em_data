@@ -8,11 +8,10 @@ NiEBSDLarge:
   data_size: 500 mb
   detector_manufacturer: NORDIF
   detector: UF-1100
+  technique: EBSD
   license: CC-BY-4.0
   tags:
-    - EBSD
     - Large Dataset
-    - Nickel
   authors:
     Håkon Wiik Ånes:
       affiliation: Norwegian University of Science and Technology

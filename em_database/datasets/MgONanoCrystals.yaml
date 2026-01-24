@@ -10,8 +10,8 @@ MgONanoCrystals:
   microscope_vendor: JEOL
   voltage: 300 kV
   license: CC-BY-4.0
+  technique: 4D-STEM
   tags:
-    - 4D-STEM
     - Virtual Imaging
     - Orientation Mapping
     - Nanocrystals

@@ -13,6 +13,8 @@ class DownloadableDataset:
                  quality:str=None,
                  doi:str=None,
                  description:str=None,
+                 detector:Optional[str]=None,
+                 detector_manufacturer:Optional[str]=None,
                  **kwargs):
         self.source = source
         self.file = file
@@ -22,6 +24,8 @@ class DownloadableDataset:
         self.doi = doi
         self.description = description
         self.metadata = kwargs
+        self.detector_manufacturer = detector_manufacturer
+        self.detector = detector
 
     def __repr__(self):
         return f"<{self.__class__} url={self.source}/{self.file} bytes={self.size()}>"
