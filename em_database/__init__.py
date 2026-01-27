@@ -13,7 +13,7 @@ if "EM_DATABASE_DATA_DIR" not in os.environ:
     # set the default dir to User's home directory + "/emdata"
     print("Setting default EM_DATABASE_DATA_DIR")
     os.environ["EM_DATABASE_DATA_DIR"] = os.path.join(
-        os.path.expanduser("~") + "\em_database"
+        os.path.expanduser("~") + "\\em_database"
     )
 
 
@@ -59,9 +59,6 @@ for root, dirs, files in os.walk(os.path.join(os.path.dirname(__file__), "datase
                 for name in data_dict_yaml:
                     class_name = name.replace(' ', '_').replace('-', '_')
                     data_dict = data_dict_yaml[name]
-                    print(data_dict)
-
-
                     def make_init(data):
                         def __init__(self):
                             super(self.__class__, self).__init__(**data)

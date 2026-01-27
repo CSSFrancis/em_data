@@ -12,6 +12,7 @@ class DownloadableDataset:
                  checksum:str=None,
                  license:str=None,
                  quality:str=None,
+                 data_size:str=None,
                  doi:str=None,
                  description:str=None,
                  detector:Optional[str]=None,
@@ -23,13 +24,14 @@ class DownloadableDataset:
         self.license = license
         self.quality = quality
         self.doi = doi
+        self.data_size = data_size
         self.description = description
         self.metadata = kwargs
         self.detector_manufacturer = detector_manufacturer
         self.detector = detector
 
     def __repr__(self):
-        return f"<{self.__class__} url={self.source}/{self.file} bytes={self.size()}>"
+        return f"<{self.__class__} url={self.source}/{self.file} bytes={self.data_size}>"
 
     def download(self,
                  destination: str | None = None,
@@ -68,8 +70,8 @@ class DownloadableDataset:
             destination = os.environ.get("EM_DATABASE_DATA_DIR",
                                          os.path.join(os.path.expanduser("~"), "em_database"))
         # Instantiate an Http downloader with a custom user agent
-        headers = {"User-Agent": "em_database (https://github.com/CSSFrancis/em_data)"}
-        downloader = pooch.HTTPDownloader(progressbar=progressbar, chunk_size=chunk_size, )
+        header = {"User-Agent": "em_database (https://github.com/CSSFrancis/em_data)"}
+        downloader = pooch.HTTPDownloader(progressbar=progressbar, chunk_size=chunk_size,header= header)
         filepath = pooch.retrieve(
             url=self.source +"/"+ self.file,
             known_hash=self.checksum,
