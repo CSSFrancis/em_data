@@ -1,0 +1,107 @@
+name: New Dataset
+description: Add a new dataset to the EM Database
+title: "[New Dataset]: "
+labels: ["new_dataset",]
+assignees:
+  - CSSFrancis
+type: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for adding a new dataset to the EM Database! Please fill out the following
+        form regarding the dataset you are submitting. Make sure to include as much relevant
+        information as possible, as this will help us review and publish your dataset faster.
+  - type: input
+    id: name
+    attributes:
+      label: author name
+      description: What is your name?
+      placeholder: ex. Jane Doe
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Dataset source URL
+      description: Please provide a URL where the dataset can be downloaded. This should be a direct link to the file itself.
+      placeholder: ex. https://zenodo.org/records/15490547/files/smallPtychography.hspy
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Dataset description
+      description: Please provide a brief description of the dataset you are submitting. Include details such as the technique used, the sample type, and any other relevant information.
+      placeholder: ex. A 4D STEM dataset of various MgO nanocrystals
+    validations:
+      required: true
+  - type: input
+    id: DetectorManufacturer
+    attributes:
+      label: Detector Manufacturer
+      description: Please provide the manufacturer of the detector used to acquire the dataset.
+      placeholder: ex. Direct Electron
+    validations:
+      required: false
+  - type: input
+    id: Detector
+    attributes:
+      label: Detector Model
+      description: Please provide the model of the detector used to acquire the dataset.
+      placeholder: ex. DE-16
+    validations:
+      required: false
+  - type: input
+    id: Vendor
+    attributes:
+        label: Microscope Vendor
+        description: Please provide the vendor of the microscope used to acquire the dataset.
+        placeholder: ex. Thermo Fisher Scientific
+    validations:
+        required: false
+  - type: input
+    id: Microscope
+    attributes:
+        label: Microscope Model
+        description: Please provide the model of the microscope used to acquire the dataset.
+        placeholder: ex. Gen 1 Titan
+    validations:
+        required: false
+  - type: input
+    id: Voltage
+    attributes:
+        label: Accelerating Voltage
+        description: Please provide the accelerating voltage used to acquire the dataset (in kV).
+        placeholder: ex. 200 kV
+    validations:
+        required: false
+  - type: input
+    id: License
+    attributes:
+        label: Dataset License
+        description: Please provide the license under which the dataset is released.
+        placeholder: ex. CC-BY-4.0
+    validations:
+        required: true
+  - type: dropdown
+    id: Technique
+    attributes:
+      label: What technique was used to acquire the dataset?
+      description: Select the technique used to acquire the dataset.
+      options:
+        - 4D-STEM
+        - EBSD
+        - IN SITU TEM
+        - SEM
+        - EELS
+        - XEDS
+        - Other
+  - type: input
+    id: Tags
+    attributes:
+      label: Dataset Tags
+      description: Please provide relevant tags for the dataset, separated by commas.
+      placeholder: ex. Orientation Mapping, Nanocrystals
+    validations:
+      required: false
