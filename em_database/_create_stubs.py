@@ -5,7 +5,6 @@ from pathlib import Path
 def build_docstring(dataset_dict) -> str:
     """ Build a docstring for the dataset from its metadata. """
     doc = f""
-    print(dataset_dict)
     if dataset_dict.get("description"):
         doc += f"{dataset_dict["description"]}\n\n"
     if dataset_dict.get("doi"):
@@ -30,7 +29,6 @@ def generate_pyi_stub():
 
     for root, dirs, files in os.walk(os.path.join(os.path.dirname(__file__), "datasets")):
         for file in files:
-            print(files)
             if file.endswith(".yaml") or file.endswith(".yml"):
                 dataset_path = os.path.join(root, file)
                 with open(dataset_path, 'r') as f:

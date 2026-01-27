@@ -8,7 +8,6 @@ __all__ = []
 
 if "EM_DATABASE_DATA_DIR" not in os.environ:
     # set the default dir to User's home directory + "/emdata"
-    print("Setting default EM_DATABASE_DATA_DIR")
     os.environ["EM_DATABASE_DATA_DIR"] = os.path.join(
         os.path.expanduser("~"),"em_database"
     )

@@ -50,7 +50,7 @@ def build_datasets_html(app, exception):
     """Generate datasets.html during Sphinx build"""
     if exception is not None:
         print(f"Build exception: {exception}")
-    datasets_path = Path(__file__).parent.parent / 'em_database' / 'datasets'
+    datasets_path = Path(__file__).parent.parent.parent / 'em_database' / 'datasets'
     print(f"Looking for datasets at: {datasets_path.absolute()}")
     print(f"Path exists: {datasets_path.exists()}")
     if datasets_path.exists():
