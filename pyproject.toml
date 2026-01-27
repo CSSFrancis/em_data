@@ -28,3 +28,8 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 em_database = ["*.pyi", "datasets/*.yaml", "datasets/*.yml"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["em_database*"]
+exclude = ["tests*", "*.tests*"]
