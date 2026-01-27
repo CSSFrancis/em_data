@@ -1,9 +1,9 @@
 # $schema: ../json-schema.json
-ZrNbPrecipitate:
-  description: A 4D STEM dataset of ZrNb precipitate in ZrNb alloy.
+PdNiPGlass:
+  description: A 4D STEM dataset of PdNiP metallic glass thin film.
   source: https://zenodo.org/records/15490547/files
-  checksum: md5:7012a2bdf564f4fb25299af05412723f
-  file: ZrNbPercipitate.zspy
+  checksum: md5:b16375d23eda3da60ea2ff36cc11c5bd
+  file: PdNiP.zspy
   data_size: 394.2 MB
   detector_manufacturer: Direct Electron
   detector: DE-16
@@ -13,8 +13,9 @@ ZrNbPrecipitate:
   license: CC-BY-4.0
   technique: 4D-STEM
   tags:
-    - Strain Mapping
+    - Amorphous
+    - FEM
+    - Angular Correlations
   authors:
-    Chenyu Zhang:
+    Carter Francis:
       affiliation: University of Wisconsin, Madison
-

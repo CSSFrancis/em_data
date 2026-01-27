@@ -3,6 +3,7 @@ from typing import Optional
 import pooch
 import os
 
+
 class DownloadableDataset:
 
     def __init__(self,
@@ -31,7 +32,9 @@ class DownloadableDataset:
         return f"<{self.__class__} url={self.source}/{self.file} bytes={self.size()}>"
 
     def download(self,
-                 destination: str | None = None,) -> str:
+                 destination: str | None = None,
+                 progressbar:bool = True,
+                 chunk_size:int =4096) -> str:
         """ Download the dataset to the specified destination if not already present.
 
         By default, this will download to the defined emdata.data_dir directory. You can set
@@ -40,19 +43,39 @@ class DownloadableDataset:
 
         If the file already exists in the destination directory and the checksum matches,
         it will not be downloaded again and the existing file path will be returned.
+
+        Parameters
+        ----------
+        destination : str, optional
+            The directory to download the dataset to. If None, uses the default emdata.data_dir
+            directory, by default None.
+        progressbar : bool, optional
+            Whether to show a progress bar during download, by default True.
+        chunk_size : int, optional
+            The chunk size to use for downloading the file, by default 4096. Increasing this value will sometimes
+            increase download speed at the cost of higher memory usage.
+
         """
 
-
+        if progressbar:
+            try:
+                import tqdm  # noqa: F401
+            except ImportError:
+                print("`tqdm` is not installed, progress bar will be disabled.")
+                progressbar = False
         # Determine the destination directory
         if destination is None:
             destination = os.environ.get("EM_DATABASE_DATA_DIR",
                                          os.path.join(os.path.expanduser("~"), "em_database"))
-
+        # Instantiate an Http downloader with a custom user agent
+        headers = {"User-Agent": "em_database (https://github.com/CSSFrancis/em_data)"}
+        downloader = pooch.HTTPDownloader(progressbar=progressbar, chunk_size=chunk_size, )
         filepath = pooch.retrieve(
             url=self.source +"/"+ self.file,
             known_hash=self.checksum,
             fname=self.file,
-            path=destination
+            path=destination,
+            downloader=downloader
         )
         return filepath
 

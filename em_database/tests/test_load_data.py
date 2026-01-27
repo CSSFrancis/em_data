@@ -9,3 +9,8 @@ def test_download_custom_location(tmp_path):
     dataset = NiEBSDLarge()
     dataset.download(destination=tmp_path)
     assert (tmp_path / "patterns_v2.h5").exists()
+
+
+def test_download_mgo_nanocrystals():
+    dataset = MgONanoCrystals()
+    dataset.download()

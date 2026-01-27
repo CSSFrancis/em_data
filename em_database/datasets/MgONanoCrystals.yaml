@@ -4,7 +4,7 @@ MgONanoCrystals:
   source: https://zenodo.org/records/15490547/files
   checksum: md5:38a03c23cec147a9cffab9ea349cd15a
   file: mgo_nano.zspy
-  data_size: 100 mb
+  data_size: 104.3 MB
   detector_manufacturer: Allied Vision
   detector: Stingray
   microscope_vendor: JEOL

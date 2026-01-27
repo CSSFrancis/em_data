@@ -5,8 +5,8 @@ description = "A database for electron microscopy data using pooch to download a
 requires-python = ">=3.12"
 dependencies = [
     "pooch",
-    "pytest>=9.0.2",
     "pyyaml",
+    "tqdm>=4.67.1",
 ]
 keywords = [
     "electron microscopy",

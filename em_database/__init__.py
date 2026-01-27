@@ -1,4 +1,6 @@
 ### Example datasets ###
+from idlelib.window import registry
+
 import pooch
 import os
 import yaml
@@ -45,7 +47,6 @@ def reset_data_dir():
     os.environ["EM_DATABASE_DATA_DIR"] = os.path.join(
         os.path.expanduser("~") + "\em_database"
     )
-
 
 # Map all the datasets in the "datasets" folder
 # recursively travel down
