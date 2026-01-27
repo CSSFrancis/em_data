@@ -11,7 +11,7 @@ if "EM_DATABASE_DATA_DIR" not in os.environ:
     # set the default dir to User's home directory + "/emdata"
     print("Setting default EM_DATABASE_DATA_DIR")
     os.environ["EM_DATABASE_DATA_DIR"] = os.path.join(
-        os.path.expanduser("~") + "/em_database"
+        os.path.expanduser("~") + "\em_database"
     )
 
 
@@ -25,7 +25,7 @@ def get_data_dir():
     str
         Path to the example datasets directory.
     """
-    return  pooch.os_cache("em_database")
+    return  os.environ["EM_DATABASE_DATA_DIR"]
 
 def set_data_dir(path: str):
     """
@@ -43,7 +43,7 @@ def reset_data_dir():
     Reset the example datasets directory to the default location.
     """
     os.environ["EM_DATABASE_DATA_DIR"] = os.path.join(
-        os.path.expanduser("~") + "/em_database"
+        os.path.expanduser("~") + "\em_database"
     )
 
 
