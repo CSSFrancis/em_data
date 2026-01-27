@@ -28,6 +28,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery",
+    'sphinx_design',
 ]
 
 templates_path = ['_templates']
@@ -41,15 +42,17 @@ exclude_patterns = []
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 master_doc = "index"
-
+html_sidebars = {
+  "datasets": []
+}
 
 def build_datasets_html(app, exception):
     """Generate datasets.html during Sphinx build"""
     if exception is None:  # Only run if build succeeded
-        datasets = parse_datasets('datasets')
+        datasets = parse_datasets('../em_database/datasets')
         html_output = generate_html_table(datasets)
 
-        output_path = Path(app.outdir) / 'datasets.html'
+        output_path = Path(app.outdir) / 'datasets_db.html'
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with output_path.open('w', encoding='utf-8') as f:
             f.write(html_output)
@@ -63,7 +66,7 @@ def setup(app):
 # https://sphinx-gallery.github.io/stable/configuration.html
 
 sphinx_gallery_conf = {
-    "examples_dirs": "../examples",
+    "examples_dirs": "../../examples",
     "gallery_dirs": "examples",
     "filename_pattern": "^((?!sgskip).)*$",
     "ignore_pattern": "_sgskip.py",

@@ -1,3 +1,5 @@
+:html_theme.sidebar_secondary.remove:
+
 Datasets
 ========
 
@@ -5,6 +7,9 @@ Browse our collection of electron microscopy datasets organized by technique.
 
 .. raw:: html
 
-   <iframe src="datasets.html" style="width: 100%; height: 800px; border: none;"></iframe>
-
-Alternatively, you can `view the full page <datasets.html>`_.
+   <style>
+   .bd-article-container {
+       max-width: 100% !important;
+   }
+   </style>
+   <iframe src="datasets_db.html" style="width: 100%; height: 800px;"></iframe>

@@ -16,6 +16,21 @@ class AlNanocrystals(DownloadableDataset):
     """
     ...
 
+class BilayerWS2(DownloadableDataset):
+    """
+    BilayerWS2
+    
+    small 4-D STEM dataset of a bilayer WS2. Each Diffraction pattern is only 8x8 pixels so the dataset is quite small although for simple non iterative ptychography 8x8 pixels should be sufficient.
+
+    License: CC-BY-4.0
+
+    You can download this dataset here:
+    https://zenodo.org/records/15490547/files
+
+
+    """
+    ...
+
 class FeAlStripes(DownloadableDataset):
     """
     FeAlStripes
@@ -106,4 +121,4 @@ class ZrNbPrecipitate(DownloadableDataset):
     """
     ...
 
-__all__ = __all__ + ['AlNanocrystals', 'FeAlStripes', 'MgONanoCrystals', 'NiEBSDLarge', 'PdNiPGlass', 'SPEDAg', 'ZrNbPrecipitate']
+__all__ = __all__ + ['AlNanocrystals', 'BilayerWS2', 'FeAlStripes', 'MgONanoCrystals', 'NiEBSDLarge', 'PdNiPGlass', 'SPEDAg', 'ZrNbPrecipitate']

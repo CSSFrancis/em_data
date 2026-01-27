@@ -67,21 +67,32 @@ def generate_html_table(datasets_by_technique):
     <head>
         <meta charset="UTF-8">
         <style>
-            table {{ border-collapse: collapse; width: 100%; }}
-            th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-            th {{ background-color: #f2f2f2; position: relative; }}
-            .tabs {{ margin: 10px 0; }}
-            .tab-button {{ padding: 8px 12px; margin-right: 6px; cursor: pointer; border: 1px solid #ccc; background: #f9f9f9; }}
-            .tab-button.active {{ background: #e9e9e9; font-weight: bold; }}
+            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 20px; background: transparent; color: inherit; }}
+            table {{ border-collapse: collapse; width: 100%; border: 1px solid color-mix(in srgb, currentColor 20%, transparent); }}
+            th, td {{ border: 1px solid color-mix(in srgb, currentColor 20%, transparent); padding: 12px 8px; text-align: left; }}
+            th {{ background-color: color-mix(in srgb, currentColor 5%, transparent); font-weight: 600; position: relative; }}
+            tr:nth-child(even) {{ background-color: color-mix(in srgb, currentColor 3%, transparent); }}
+            tr:hover {{ background-color: color-mix(in srgb, currentColor 8%, transparent); }}
+            a {{ color: #2980b9; text-decoration: none; }}
+            @media (prefers-color-scheme: dark) {{
+                a {{ color: #3091d1; }}
+            }}
+            a:hover {{ text-decoration: underline; }}
+            .tabs {{ margin: 15px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent); }}
+            .tab-button {{ padding: 10px 16px; margin-right: 4px; cursor: pointer; border: none; background: transparent; color: inherit; font-size: 14px; border-bottom: 3px solid transparent; }}
+            .tab-button:hover {{ background: color-mix(in srgb, currentColor 5%, transparent); }}
+            .tab-button.active {{ border-bottom-color: #2980b9; font-weight: 600; }}
             .filter-dropdown {{ position: relative; display: inline-block; }}
-            .filter-button {{ cursor: pointer; padding: 4px 8px; background: #fff; border: 1px solid #ccc; border-radius: 3px; margin-left: 8px; }}
-            .filter-content {{ display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; z-index: 1000; min-width: 250px; max-height: 300px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }}
+            .filter-button {{ cursor: pointer; padding: 4px 8px; background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 20%, transparent); color: inherit; border-radius: 3px; margin-left: 8px; font-size: 12px; }}
+            .filter-button:hover {{ background: color-mix(in srgb, currentColor 8%, transparent); }}
+            .filter-content {{ display: none; position: absolute; background: color-mix(in srgb, currentColor 2%, transparent); border: 1px solid color-mix(in srgb, currentColor 20%, transparent); padding: 10px; z-index: 1000; min-width: 250px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-radius: 4px; backdrop-filter: blur(10px); }}
             .filter-dropdown.active .filter-content {{ display: block; }}
-            .filter-checkbox {{ display: block; margin: 5px 0; }}
+            .filter-checkbox {{ display: block; margin: 5px 0; cursor: pointer; }}
             .manufacturer-group {{ margin: 10px 0; padding-left: 10px; }}
-            .manufacturer-label {{ font-weight: bold; margin: 8px 0 4px 0; }}
+            .manufacturer-label {{ font-weight: 600; margin: 8px 0 4px 0; }}
             .detector-checkbox {{ display: block; margin: 3px 0; padding-left: 20px; }}
             th:nth-child(5), td:nth-child(5) {{ min-width: 200px; }}
+            h1 {{ border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent); padding-bottom: 10px; }}
         </style>
     </head>
     <body>
@@ -298,7 +309,7 @@ if __name__ == "__main__":
     print(datasets)
     html_output = generate_html_table(datasets)
 
-    output_path = Path('docs/datasets.html')
+    output_path = Path('docs/datasets_db.html')
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open('w', encoding='utf-8') as f:
         f.write(html_output)

@@ -12,35 +12,33 @@ places.
 Learning resources
 ==================
 
-
 .. grid:: 1 3 3 3
-  :gutter: 2
+    :gutter: 2
 
-  .. grid-item-card::
-    :link: auto_examples/index
-    :link-type: doc
+    .. grid-item-card::
+        :link: examples/index
+        :link-type: doc
 
-    :octicon:`zap;2em;sd-text-info` Examples
-    ^^^
+        :octicon:`zap;2em;sd-text-info` Examples
+        ^^^
 
-    Gallery of short examples illustrating simple tasks that can be performed with EM-Database.
+        Gallery of short examples illustrating simple tasks that can be performed with EM-Database.
 
-  .. grid-item-card::
-    :link: datasets/index
-    :link-type: doc
+    .. grid-item-card::
+        :link: datasets
+        :link-type: doc
 
-    :octicon:`database;2em;sd-text-info` Datasets
-    ^^^
+        :octicon:`database;2em;sd-text-info` Datasets
+        ^^^
 
-    Browse available electron microscopy datasets and learn how to access them.
+        Browse available electron microscopy datasets and learn how to access them.
 
-  .. grid-item-card::
-    :link: reference/index
-    :link-type: doc
+    .. grid-item-card::
+        :link: reference/index
+        :link-type: doc
 
-    :octicon:`code-square;2em;sd-text-info` API
-    ^^^
+        :octicon:`code-square;2em;sd-text-info` API
+        ^^^
 
-    Documentation of the Application Programming Interface (API),
-    which describes how EM-Database functions work and which parameters can be used.
-```
+        Documentation of the Application Programming Interface (API),
+        which describes how EM-Database functions work and which parameters can be used.

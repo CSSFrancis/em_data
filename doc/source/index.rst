@@ -4,7 +4,7 @@
 
   Introduction <intro.rst>
   Reference <reference/index>
+  Datasets <datasets.rst>
   Examples <examples/index.rst>
-  Changes <changes.rst>
 
 .. include:: intro.rst

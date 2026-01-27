@@ -1,3 +1,4 @@
+""" Auto-generated dataset classes from YAML Files for downloading data."""
 import os
 import yaml
 from em_database.downloadable_dataset import DownloadableDataset
@@ -15,18 +16,18 @@ for root, dirs, files in os.walk(os.path.join(os.path.dirname(__file__), "../dat
                 for name in data_dict_yaml:
                     class_name = name.replace(' ', '_').replace('-', '_')
                     data_dict = data_dict_yaml[name]
-                    def make_init(data):
+                    def _make_init(data):
                         def __init__(self):
                             super(self.__class__, self).__init__(**data)
 
                         return __init__
 
 
-                    new_class = type(class_name,
+                    _new_class = type(class_name,
                                      (DownloadableDataset,),
-                                     {"__init__": make_init(data_dict),
+                                     {"__init__": _make_init(data_dict),
                                       "__doc__": build_docstring(data_dict)})
 
                     # Add to module globals and __all__
-                    globals()[class_name] = new_class
+                    globals()[class_name] = _new_class
                     __all__.append(class_name)

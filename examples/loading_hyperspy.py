@@ -6,10 +6,10 @@ This example demonstrates how to load and visualize data using the HyperSpy libr
 """
 
 import hyperspy.api as hs
-from em_database.data import SPEDAg
+from em_database.data import BilayerWS2
 
 # Load a dataset using HyperSpy
-dataset = SPEDAg()
+dataset = BilayerWS2()
 data_path = dataset.download()  # Download the dataset if not already available
 data = hs.load(data_path)
 data

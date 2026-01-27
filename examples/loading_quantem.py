@@ -7,9 +7,9 @@ This example demonstrates how to load data into the quantem package.
 
 from quantem.core.io.file_readers import read_4dstem
 
-from em_database import FeAlStripes
+from em_database.data import BilayerWS2
 # Ensure the dataset is downloaded
-dataset = FeAlStripes()
+dataset = BilayerWS2()
 file_path = dataset.download()
 # Load the data using quantem
 data = read_4dstem(file_path)
