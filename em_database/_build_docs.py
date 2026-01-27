@@ -67,32 +67,100 @@ def generate_html_table(datasets_by_technique):
     <head>
         <meta charset="UTF-8">
         <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 20px; background: transparent; color: inherit; }}
-            table {{ border-collapse: collapse; width: 100%; border: 1px solid color-mix(in srgb, currentColor 20%, transparent); }}
-            th, td {{ border: 1px solid color-mix(in srgb, currentColor 20%, transparent); padding: 12px 8px; text-align: left; }}
-            th {{ background-color: color-mix(in srgb, currentColor 5%, transparent); font-weight: 600; position: relative; }}
-            tr:nth-child(even) {{ background-color: color-mix(in srgb, currentColor 3%, transparent); }}
-            tr:hover {{ background-color: color-mix(in srgb, currentColor 8%, transparent); }}
-            a {{ color: #2980b9; text-decoration: none; }}
-            @media (prefers-color-scheme: dark) {{
-                a {{ color: #3091d1; }}
+            :root {{
+                color-scheme: light dark;
+            }}
+            body {{ 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+                margin: 0; 
+                padding: 20px; 
+                background: transparent; 
+                color: inherit; 
+            }}
+            table {{ 
+                border-collapse: collapse; 
+                width: 100%; 
+                border: 1px solid light-dark(#ddd, #444); 
+            }}
+            th, td {{ 
+                border: 1px solid light-dark(#ddd, #444); 
+                padding: 12px 8px; 
+                text-align: left; 
+            }}
+            th {{ 
+                background-color: light-dark(#f5f5f5, #2d2d2d); 
+                font-weight: 600; 
+                position: relative; 
+            }}
+            tr:nth-child(even) {{ 
+                background-color: light-dark(#f9f9f9, #252525); 
+            }}
+            tr:hover {{ 
+                background-color: light-dark(#f0f0f0, #333); 
+            }}
+            a {{ 
+                color: light-dark(#2980b9, #3091d1); 
+                text-decoration: none; 
             }}
             a:hover {{ text-decoration: underline; }}
-            .tabs {{ margin: 15px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent); }}
-            .tab-button {{ padding: 10px 16px; margin-right: 4px; cursor: pointer; border: none; background: transparent; color: inherit; font-size: 14px; border-bottom: 3px solid transparent; }}
-            .tab-button:hover {{ background: color-mix(in srgb, currentColor 5%, transparent); }}
-            .tab-button.active {{ border-bottom-color: #2980b9; font-weight: 600; }}
+            .tabs {{ 
+                margin: 15px 0; 
+                border-bottom: 1px solid light-dark(#ddd, #444); 
+            }}
+            .tab-button {{ 
+                padding: 10px 16px; 
+                margin-right: 4px; 
+                cursor: pointer; 
+                border: none; 
+                background: transparent; 
+                color: inherit; 
+                font-size: 14px; 
+                border-bottom: 3px solid transparent; 
+            }}
+            .tab-button:hover {{ 
+                background: light-dark(#f5f5f5, #2d2d2d); 
+            }}
+            .tab-button.active {{ 
+                border-bottom-color: light-dark(#2980b9, #3091d1); 
+                font-weight: 600; 
+            }}
             .filter-dropdown {{ position: relative; display: inline-block; }}
-            .filter-button {{ cursor: pointer; padding: 4px 8px; background: color-mix(in srgb, currentColor 3%, transparent); border: 1px solid color-mix(in srgb, currentColor 20%, transparent); color: inherit; border-radius: 3px; margin-left: 8px; font-size: 12px; }}
-            .filter-button:hover {{ background: color-mix(in srgb, currentColor 8%, transparent); }}
-            .filter-content {{ display: none; position: absolute; background: color-mix(in srgb, currentColor 2%, transparent); border: 1px solid color-mix(in srgb, currentColor 20%, transparent); padding: 10px; z-index: 1000; min-width: 250px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-radius: 4px; backdrop-filter: blur(10px); }}
+            .filter-button {{ 
+                cursor: pointer; 
+                padding: 4px 8px; 
+                background: light-dark(#f5f5f5, #2d2d2d); 
+                border: 1px solid light-dark(#ddd, #444); 
+                color: inherit; 
+                border-radius: 3px; 
+                margin-left: 8px; 
+                font-size: 12px; 
+            }}
+            .filter-button:hover {{ 
+                background: light-dark(#e8e8e8, #333); 
+            }}
+            .filter-content {{ 
+                display: none; 
+                position: absolute; 
+                background: light-dark(white, #1e1e1e); 
+                border: 1px solid light-dark(#ddd, #444); 
+                padding: 10px; 
+                z-index: 1000; 
+                min-width: 250px; 
+                max-height: 300px; 
+                overflow-y: auto; 
+                box-shadow: 0 4px 6px light-dark(rgba(0,0,0,0.1), rgba(0,0,0,0.5)); 
+                border-radius: 4px; 
+            }}
             .filter-dropdown.active .filter-content {{ display: block; }}
             .filter-checkbox {{ display: block; margin: 5px 0; cursor: pointer; }}
             .manufacturer-group {{ margin: 10px 0; padding-left: 10px; }}
             .manufacturer-label {{ font-weight: 600; margin: 8px 0 4px 0; }}
             .detector-checkbox {{ display: block; margin: 3px 0; padding-left: 20px; }}
             th:nth-child(5), td:nth-child(5) {{ min-width: 200px; }}
-            h1 {{ border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent); padding-bottom: 10px; }}
+            h1 {{ 
+                border-bottom: 1px solid light-dark(#ddd, #444); 
+                padding-bottom: 10px; 
+            }}
         </style>
     </head>
     <body>
