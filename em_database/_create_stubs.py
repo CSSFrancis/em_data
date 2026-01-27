@@ -54,10 +54,10 @@ def generate_pyi_stub():
                         dataset_classes.append(class_name)
 
     # Add __all__ to stub
-    stub_lines.append(f"__all__ = {dataset_classes}")
+    stub_lines.append(f"__all__ = __all__ + {dataset_classes }")
 
     # Write stub file
-    stub_path = Path(__file__).parent / "__init__.pyi"
+    stub_path = Path(__file__).parent / "data/__init__.pyi"
     with open(stub_path, 'w') as f:
         f.write('\n'.join(stub_lines))
 

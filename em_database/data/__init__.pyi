@@ -106,4 +106,4 @@ class ZrNbPrecipitate(DownloadableDataset):
     """
     ...
 
-__all__ = ['AlNanocrystals', 'FeAlStripes', 'MgONanoCrystals', 'NiEBSDLarge', 'PdNiPGlass', 'SPEDAg', 'ZrNbPrecipitate']
+__all__ = __all__ + ['AlNanocrystals', 'FeAlStripes', 'MgONanoCrystals', 'NiEBSDLarge', 'PdNiPGlass', 'SPEDAg', 'ZrNbPrecipitate']

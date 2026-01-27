@@ -1,7 +1,7 @@
 import em_database
 import pytest
 import os
-
+from em_database import data
 def test_get_data_dir():
     default_dir = em_database.get_data_dir()
     assert default_dir==  os.path.join(os.path.expanduser("~") + "\em_database")
@@ -16,7 +16,7 @@ def test_set_data_dir():
     assert default_dir==  os.path.join(os.path.expanduser("~") + "\em_database")
 
 def test_saving_to_default_dir():
-    dataset = em_database.NiEBSDLarge()
+    dataset = data.NiEBSDLarge()
     dataset.download()
     assert os.path.exists(os.path.join(em_database.get_data_dir(), "patterns_v2.h5"))
     ## make sure that it doesn't download the second time.
@@ -26,7 +26,7 @@ def test_saving_to_default_dir():
 def test_saving_to_non_default_dir():
     test_dir = os.path.join(os.path.expanduser("~"), "test_em_database_dir")
     em_database.set_data_dir(test_dir)
-    dataset = em_database.NiEBSDLarge()
+    dataset = em_database.data.NiEBSDLarge()
     dataset.download()
     assert os.path.exists(os.path.join(em_database.get_data_dir(), "patterns_v2.h5"))
     ## make sure that it doesn't download the second time.
@@ -36,7 +36,7 @@ def test_saving_to_non_default_dir():
     # Clean up by resetting to default
     em_database.reset_data_dir()
     default_dir = em_database.get_data_dir()
-    assert default_dir==  os.path.join(os.path.expanduser("~") + "\em
+    assert default_dir==  os.path.join(os.path.expanduser("~") + "\em_database")
 
 
 def test_reset_data_dir():

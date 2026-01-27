@@ -70,8 +70,10 @@ class DownloadableDataset:
             destination = os.environ.get("EM_DATABASE_DATA_DIR",
                                          os.path.join(os.path.expanduser("~"), "em_database"))
         # Instantiate an Http downloader with a custom user agent
-        header = {"User-Agent": "em_database (https://github.com/CSSFrancis/em_data)"}
-        downloader = pooch.HTTPDownloader(progressbar=progressbar, chunk_size=chunk_size,header= header)
+        headers = {"User-Agent": "em_database (https://github.com/CSSFrancis/em_data)"}
+        downloader = pooch.HTTPDownloader(progressbar=progressbar,
+                                          chunk_size=chunk_size,
+                                          headers= headers)
         filepath = pooch.retrieve(
             url=self.source +"/"+ self.file,
             known_hash=self.checksum,

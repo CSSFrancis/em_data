@@ -1,5 +1,9 @@
-from em_database import NiEBSDLarge, MgONanoCrystals
-
+from em_database.data import NiEBSDLarge, MgONanoCrystals
+try:
+    from quantem.core.io.file_readers import read_4dstem
+    QUANTEM_AVAILABLE = True
+except ImportError:
+    QUANTEM_AVAILABLE = False
 
 def test_download_ni_ebsd():
     dataset = NiEBSDLarge()
@@ -14,3 +18,11 @@ def test_download_custom_location(tmp_path):
 def test_download_mgo_nanocrystals():
     dataset = MgONanoCrystals()
     dataset.download()
+
+
+def test_quantem_loading():
+    dataset = MgONanoCrystals()
+    file_path = dataset.download()
+    if QUANTEM_AVAILABLE:
+        data = read_4dstem(file_path)
+        print(data)

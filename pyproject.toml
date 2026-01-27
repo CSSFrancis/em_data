@@ -14,4 +14,6 @@ keywords = [
     "database",
     "materials science",
 ]
-optional-dependencies = { tests = ["pytest", "pytest-cov"], doc = ["sphinx", "sphinx-rtd-theme"] }
+[project.optional-dependencies]
+tests = ["pytest", "pytest-cov", "hyperspy", "quantem"]
+doc = ["sphinx", "sphinx-rtd-theme","sphinx-gallery", "quantem", "hyperspy","pydata_sphinx_theme","sphinx_design",]
