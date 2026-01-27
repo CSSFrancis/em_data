@@ -49,7 +49,8 @@ html_sidebars = {
 def build_datasets_html(app, exception):
     """Generate datasets.html during Sphinx build"""
     if exception is None:  # Only run if build succeeded
-        datasets = parse_datasets('../em_database/datasets')
+        datasets_path = Path(__file__).parent.parent / 'em_database' / 'datasets'
+        datasets = parse_datasets(datasets_path)
         html_output = generate_html_table(datasets)
 
         output_path = Path(app.outdir) / 'datasets_db.html'

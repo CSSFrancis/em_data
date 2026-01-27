@@ -1,9 +1,5 @@
 ### Example datasets ###
-from idlelib.window import registry
-
-import pooch
 import os
-import yaml
 from em_database.downloadable_dataset import DownloadableDataset
 from em_database._create_stubs import build_docstring
 from em_database import data
@@ -14,7 +10,7 @@ if "EM_DATABASE_DATA_DIR" not in os.environ:
     # set the default dir to User's home directory + "/emdata"
     print("Setting default EM_DATABASE_DATA_DIR")
     os.environ["EM_DATABASE_DATA_DIR"] = os.path.join(
-        os.path.expanduser("~") + "\\em_database"
+        os.path.expanduser("~"),"em_database"
     )
 
 
@@ -46,7 +42,7 @@ def reset_data_dir():
     Reset the example datasets directory to the default location.
     """
     os.environ["EM_DATABASE_DATA_DIR"] = os.path.join(
-        os.path.expanduser("~") + "\em_database"
+        os.path.expanduser("~"),"em_database"
     )
 
 

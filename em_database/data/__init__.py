@@ -1,5 +1,7 @@
 """ Auto-generated dataset classes from YAML Files for downloading data."""
 import os
+from pathlib import Path
+
 import yaml
 from em_database.downloadable_dataset import DownloadableDataset
 from em_database._create_stubs import build_docstring
@@ -7,7 +9,8 @@ from em_database._create_stubs import build_docstring
 # Map all the datasets in the "datasets" folder
 # recursively travel down
 __all__ = []
-for root, dirs, files in os.walk(os.path.join(os.path.dirname(__file__), "../datasets")):
+datasets_path = Path(__file__).parent.parent / "datasets"
+for root, dirs, files in os.walk(datasets_path):
     for file in files:
         if file.endswith(".yaml") or file.endswith(".yml"):
             dataset_path = os.path.join(root, file)
