@@ -7,7 +7,6 @@ dependencies = [
     "pooch",
     "pyyaml",
     "tqdm>=4.67.1",
-    "uv>=0.9.27",
 ]
 keywords = [
     "electron microscopy",
