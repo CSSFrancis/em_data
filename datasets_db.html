@@ -1,0 +1,360 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            :root {
+                color-scheme: light dark;
+            }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+                margin: 0; 
+                padding: 20px; 
+                background: transparent; 
+                color: inherit; 
+            }
+            table { 
+                border-collapse: collapse; 
+                width: 100%; 
+                border: 1px solid light-dark(#ddd, #444); 
+            }
+            th, td { 
+                border: 1px solid light-dark(#ddd, #444); 
+                padding: 12px 8px; 
+                text-align: left; 
+            }
+            th { 
+                background-color: light-dark(#f5f5f5, #2d2d2d); 
+                font-weight: 600; 
+                position: relative; 
+            }
+            tr:nth-child(even) { 
+                background-color: light-dark(#f9f9f9, #252525); 
+            }
+            tr:hover { 
+                background-color: light-dark(#f0f0f0, #333); 
+            }
+            a { 
+                color: light-dark(#2980b9, #3091d1); 
+                text-decoration: none; 
+            }
+            a:hover { text-decoration: underline; }
+            .tabs { 
+                margin: 15px 0; 
+                border-bottom: 1px solid light-dark(#ddd, #444); 
+            }
+            .tab-button { 
+                padding: 10px 16px; 
+                margin-right: 4px; 
+                cursor: pointer; 
+                border: none; 
+                background: transparent; 
+                color: inherit; 
+                font-size: 14px; 
+                border-bottom: 3px solid transparent; 
+            }
+            .tab-button:hover { 
+                background: light-dark(#f5f5f5, #2d2d2d); 
+            }
+            .tab-button.active { 
+                border-bottom-color: light-dark(#2980b9, #3091d1); 
+                font-weight: 600; 
+            }
+            .filter-dropdown { position: relative; display: inline-block; }
+            .filter-button { 
+                cursor: pointer; 
+                padding: 4px 8px; 
+                background: light-dark(#f5f5f5, #2d2d2d); 
+                border: 1px solid light-dark(#ddd, #444); 
+                color: inherit; 
+                border-radius: 3px; 
+                margin-left: 8px; 
+                font-size: 12px; 
+            }
+            .filter-button:hover { 
+                background: light-dark(#e8e8e8, #333); 
+            }
+            .filter-content { 
+                display: none; 
+                position: absolute; 
+                background: light-dark(white, #1e1e1e); 
+                border: 1px solid light-dark(#ddd, #444); 
+                padding: 10px; 
+                z-index: 1000; 
+                min-width: 250px; 
+                max-height: 300px; 
+                overflow-y: auto; 
+                box-shadow: 0 4px 6px light-dark(rgba(0,0,0,0.1), rgba(0,0,0,0.5)); 
+                border-radius: 4px; 
+            }
+            .filter-dropdown.active .filter-content { display: block; }
+            .filter-checkbox { display: block; margin: 5px 0; cursor: pointer; }
+            .manufacturer-group { margin: 10px 0; padding-left: 10px; }
+            .manufacturer-label { font-weight: 600; margin: 8px 0 4px 0; }
+            .detector-checkbox { display: block; margin: 3px 0; padding-left: 20px; }
+            th:nth-child(5), td:nth-child(5) { min-width: 200px; }
+            h1 { 
+                border-bottom: 1px solid light-dark(#ddd, #444); 
+                padding-bottom: 10px; 
+            }
+        </style>
+    </head>
+    <body>
+        <h1>EM Datasets</h1>
+
+        <div class="tabs" id="techTabs">
+            <!-- Tabs will be injected here -->
+        </div>
+
+        <table id="datasetsTable">
+            <thead>
+                <tr>
+                    <th>Technique</th>
+                    <th>Dataset</th>
+                    <th>Description</th>
+                    <th>
+                        Tags
+                        <div class="filter-dropdown" id="tagsFilter">
+                            <span class="filter-button">▼</span>
+                            <div class="filter-content" id="tagsContent"></div>
+                        </div>
+                    </th>
+                    <th>
+                        Detector
+                        <div class="filter-dropdown" id="detectorFilter">
+                            <span class="filter-button">▼</span>
+                            <div class="filter-content" id="detectorContent"></div>
+                        </div>
+                    </th>
+                    <th>File</th>
+                    <th>License</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-tags="Amorphous, FEM, Angular Correlations" data-technique="4D-STEM" data-detector="DE-16" data-manufacturer="Direct Electron">
+                <td>4D-STEM</td>
+                <td><strong>PdNiPGlass</strong></td>
+                <td>A 4D STEM dataset of PdNiP metallic glass thin film.</td>
+                <td>Amorphous, FEM, Angular Correlations</td>
+                <td>Direct Electron - DE-16</td>
+                <td><a href="https://zenodo.org/records/15490547/files">PdNiP.zspy</a></td>
+                <td>CC-BY-4.0</td>
+            </tr>
+                <tr data-tags="Strain Mapping" data-technique="4D-STEM" data-detector="DE-16" data-manufacturer="Direct Electron">
+                <td>4D-STEM</td>
+                <td><strong>ZrNbPrecipitate</strong></td>
+                <td>A 4D STEM dataset of ZrNb precipitate in ZrNb alloy.</td>
+                <td>Strain Mapping</td>
+                <td>Direct Electron - DE-16</td>
+                <td><a href="https://zenodo.org/records/15490547/files">ZrNbPercipitate.zspy</a></td>
+                <td>CC-BY-4.0</td>
+            </tr>
+                <tr data-tags="Virtual Imaging, Orientation Mapping, Nanocrystals" data-technique="4D-STEM" data-detector="Stingray" data-manufacturer="Allied Vision">
+                <td>4D-STEM</td>
+                <td><strong>MgONanoCrystals</strong></td>
+                <td>A 4D STEM dataset of various MgO nanocrystals</td>
+                <td>Virtual Imaging, Orientation Mapping, Nanocrystals</td>
+                <td>Allied Vision - Stingray</td>
+                <td><a href="https://zenodo.org/records/15490547/files">mgo_nano.zspy</a></td>
+                <td>CC-BY-4.0</td>
+            </tr>
+                <tr data-tags="Orientation Mapping, Grain Boundaries, Twins, Precession" data-technique="4D-STEM" data-detector="Merlin" data-manufacturer="Quantum Detectors">
+                <td>4D-STEM</td>
+                <td><strong>SPEDAg</strong></td>
+                <td>A 4D STEM dataset of polycrystalline Ag including twins and grain boundaries.</td>
+                <td>Orientation Mapping, Grain Boundaries, Twins, Precession</td>
+                <td>Quantum Detectors - Merlin</td>
+                <td><a href="https://zenodo.org/records/15490547/files">SPED-Ag.zspy</a></td>
+                <td>CC-BY-4.0</td>
+            </tr>
+                <tr data-tags="Orientation Mapping, Nanocrystals" data-technique="4D-STEM" data-detector="CeleritasXS" data-manufacturer="Direct Electron">
+                <td>4D-STEM</td>
+                <td><strong>BilayerWS2</strong></td>
+                <td>small 4-D STEM dataset of a bilayer WS2. Each Diffraction pattern is only 8x8 pixels so the dataset is quite small although for simple non iterative ptychography 8x8 pixels should be sufficient.</td>
+                <td>Orientation Mapping, Nanocrystals</td>
+                <td>Direct Electron - CeleritasXS</td>
+                <td><a href="https://zenodo.org/records/15490547/files">smallPtychography.hspy</a></td>
+                <td>CC-BY-4.0</td>
+            </tr>
+                <tr data-tags="Strain Mapping" data-technique="4D-STEM" data-detector="Merlin" data-manufacturer="Quantum Detectors">
+                <td>4D-STEM</td>
+                <td><strong>FeAlStripes</strong></td>
+                <td>A 4D STEM dataset with FeAl stripes exhibiting magnetic stripes. The dataset can be used to study the correlation between structural and magnetic properties.</td>
+                <td>Strain Mapping</td>
+                <td>Quantum Detectors - Merlin</td>
+                <td><a href="https://zenodo.org/records/15490547/files">FeAl_stripes.zspy</a></td>
+                <td>CC-BY-4.0</td>
+            </tr>
+                <tr data-tags="Orientation Mapping, Nanocrystals" data-technique="4D-STEM" data-detector="CeleritasXS" data-manufacturer="Direct Electron">
+                <td>4D-STEM</td>
+                <td><strong>AlNanocrystals</strong></td>
+                <td>A 4D STEM dataset of Al nanocrystals on a carbon support.</td>
+                <td>Orientation Mapping, Nanocrystals</td>
+                <td>Direct Electron - CeleritasXS</td>
+                <td><a href="https://zenodo.org/records/15490547/files">AlNanocrystalsSmaller.zspy</a></td>
+                <td>CC-BY-4.0</td>
+            </tr>
+                <tr data-tags="Large Dataset" data-technique="EBSD" data-detector="UF-1100" data-manufacturer="NORDIF">
+                <td>EBSD</td>
+                <td><strong>NiEBSDLarge</strong></td>
+                <td>4125 EBSD patterns in a (55, 75) navigation shape of (60, 60) pixels from nickel, acquired on a NORDIF UF-1100 detector</td>
+                <td>Large Dataset</td>
+                <td>NORDIF - UF-1100</td>
+                <td><a href="https://raw.githubusercontent.com/pyxem/kikuchipy-data/bcab8f7a4ffdb86a97f14e2327a4813d3156a85e/nickel_ebsd_large/">patterns_v2.h5</a></td>
+                <td>CC-BY-4.0</td>
+            </tr>
+            </tbody>
+        </table>
+        <script>
+            const techniqueTags = {"4D-STEM": ["Amorphous", "Angular Correlations", "FEM", "Grain Boundaries", "Nanocrystals", "Orientation Mapping", "Precession", "Strain Mapping", "Twins", "Virtual Imaging"], "EBSD": ["Large Dataset"]};
+            const techniqueDetectors = {"4D-STEM": {"Direct Electron": ["CeleritasXS", "DE-16"], "Allied Vision": ["Stingray"], "Quantum Detectors": ["Merlin"]}, "EBSD": {"NORDIF": ["UF-1100"]}};
+            const allTags = ["Amorphous", "Angular Correlations", "FEM", "Grain Boundaries", "Large Dataset", "Nanocrystals", "Orientation Mapping", "Precession", "Strain Mapping", "Twins", "Virtual Imaging"];
+            const allDetectors = {"Direct Electron": ["CeleritasXS", "DE-16"], "Allied Vision": ["Stingray"], "Quantum Detectors": ["Merlin"], "NORDIF": ["UF-1100"]};
+            let currentTechnique = 'All';
+
+            function createTabs() {
+                const tabs = document.getElementById('techTabs');
+                const allButton = document.createElement('button');
+                allButton.textContent = 'All';
+                allButton.className = 'tab-button active';
+                allButton.onclick = () => filterTechnique('All');
+                tabs.appendChild(allButton);
+
+                Object.keys(techniqueTags).sort().forEach(tech => {
+                    const btn = document.createElement('button');
+                    btn.textContent = tech;
+                    btn.className = 'tab-button';
+                    btn.onclick = () => filterTechnique(tech);
+                    tabs.appendChild(btn);
+                });
+            }
+
+            function renderFilterCheckboxes(containerId, items) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                items.forEach(item => {
+                    const label = document.createElement('label');
+                    label.className = 'filter-checkbox';
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.value = item;
+                    input.onchange = filterTable;
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(' ' + item));
+                    container.appendChild(label);
+                });
+            }
+
+            function renderDetectorCheckboxes(detectors) {
+                const container = document.getElementById('detectorContent');
+                container.innerHTML = '';
+
+                Object.keys(detectors).sort().forEach(manufacturer => {
+                    const group = document.createElement('div');
+                    group.className = 'manufacturer-group';
+
+                    const mfrLabel = document.createElement('label');
+                    mfrLabel.className = 'manufacturer-label filter-checkbox';
+                    const mfrInput = document.createElement('input');
+                    mfrInput.type = 'checkbox';
+                    mfrInput.value = manufacturer;
+                    mfrInput.dataset.type = 'manufacturer';
+                    mfrInput.onchange = (e) => {
+                        const detectorInputs = group.querySelectorAll('input[data-manufacturer="' + manufacturer + '"]');
+                        detectorInputs.forEach(input => input.checked = e.target.checked);
+                        filterTable();
+                    };
+                    mfrLabel.appendChild(mfrInput);
+                    mfrLabel.appendChild(document.createTextNode(' ' + manufacturer));
+                    group.appendChild(mfrLabel);
+
+                    detectors[manufacturer].forEach(detector => {
+                        const label = document.createElement('label');
+                        label.className = 'detector-checkbox';
+                        const input = document.createElement('input');
+                        input.type = 'checkbox';
+                        input.value = detector;
+                        input.dataset.manufacturer = manufacturer;
+                        input.onchange = filterTable;
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(' ' + detector));
+                        group.appendChild(label);
+                    });
+
+                    container.appendChild(group);
+                });
+            }
+
+            function updateFilters(technique) {
+                const tags = technique === 'All' ? allTags : (techniqueTags[technique] || []);
+                const detectors = technique === 'All' ? allDetectors : (techniqueDetectors[technique] || {});
+                renderFilterCheckboxes('tagsContent', tags);
+                renderDetectorCheckboxes(detectors);
+            }
+
+            function setActiveTab(name) {
+                const buttons = document.querySelectorAll('.tab-button');
+                buttons.forEach(b => {
+                    b.classList.toggle('active', b.textContent === name);
+                });
+            }
+
+            function filterTechnique(technique) {
+                currentTechnique = technique;
+                setActiveTab(technique);
+                updateFilters(technique);
+                filterTable();
+            }
+
+            function filterTable() {
+                const selectedTags = Array.from(document.querySelectorAll('#tagsContent input:checked')).map(cb => cb.value);
+                const selectedDetectors = Array.from(document.querySelectorAll('#detectorContent input:checked:not([data-type="manufacturer"])')).map(cb => cb.value);
+                const rows = document.querySelectorAll('#datasetsTable tbody tr');
+
+                rows.forEach(row => {
+                    const rowTechnique = row.dataset.technique;
+                    if (currentTechnique !== 'All' && rowTechnique !== currentTechnique) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    const rowTags = row.dataset.tags ? row.dataset.tags.split(', ').filter(t => t) : [];
+                    const rowDetector = row.dataset.detector;
+
+                    const tagsMatch = selectedTags.length === 0 || selectedTags.every(tag => rowTags.includes(tag));
+                    const detectorMatch = selectedDetectors.length === 0 || selectedDetectors.includes(rowDetector);
+
+                    row.style.display = (tagsMatch && detectorMatch) ? '' : 'none';
+                });
+            }
+
+            // Toggle dropdown visibility
+            document.querySelectorAll('.filter-dropdown .filter-button').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const dropdown = btn.parentElement;
+                    document.querySelectorAll('.filter-dropdown').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('active');
+                    });
+                    dropdown.classList.toggle('active');
+                };
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('active'));
+            });
+
+            // Prevent dropdown from closing when clicking inside
+            document.querySelectorAll('.filter-content').forEach(content => {
+                content.onclick = (e) => e.stopPropagation();
+            });
+
+            // Initialize UI
+            createTabs();
+            updateFilters('All');
+        </script>
+    </body>
+    </html>
+    

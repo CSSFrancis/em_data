@@ -1,0 +1,12 @@
+em\_database.downloadable\_dataset
+==================================
+
+.. automodule:: em_database.downloadable_dataset
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DownloadableDataset
+   
