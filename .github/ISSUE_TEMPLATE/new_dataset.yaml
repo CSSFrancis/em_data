@@ -11,11 +11,18 @@ body:
       value: |
         Thanks for adding a new dataset to the EM Database! Please fill out the following
         form regarding the dataset you are submitting. Make sure to include as much relevant
-        information as possible, as this will help us review and publish your dataset faster.
+  - type: input
+    id: dataset_name
+    attributes:
+      label: --Dataset Name--
+      description: Please provide a short name for the dataset you are submitting. This will be used as the identifier for the dataset in the database so short and descriptive is best.
+      placeholder: ex. MgONanocrystals
+    validations:
+      required: true
   - type: input
     id: name
     attributes:
-      label: author name
+      label: --Author--
       description: What is your name?
       placeholder: ex. Jane Doe
     validations:
@@ -23,15 +30,23 @@ body:
   - type: input
     id: url
     attributes:
-      label: Dataset source URL
+      label: --URL--
       description: Please provide a URL where the dataset can be downloaded. This should be a direct link to the file itself.
       placeholder: ex. https://zenodo.org/records/15490547/files/smallPtychography.hspy
+    validations:
+      required: true
+  - type: input
+    id: checksum
+    attributes:
+      label: --Checksum--
+      description: Please provide the checksum of the dataset file for verification purposes. Include the type of checksum (e.g., md5, sha256) followed by the checksum value.
+      placeholder: ex. md5:df9376d5c020a23f0f7f51cfe79f303f
     validations:
       required: true
   - type: textarea
     id: description
     attributes:
-      label: Dataset description
+      label: --Description--
       description: Please provide a brief description of the dataset you are submitting. Include details such as the technique used, the sample type, and any other relevant information.
       placeholder: ex. A 4D STEM dataset of various MgO nanocrystals
     validations:
@@ -39,7 +54,7 @@ body:
   - type: input
     id: detector_manufacturer
     attributes:
-      label: Detector Manufacturer
+      label: --Detector Manufacturer--
       description: Please provide the manufacturer of the detector used to acquire the dataset.
       placeholder: ex. Direct Electron
     validations:
@@ -87,7 +102,7 @@ body:
   - type: dropdown
     id: technique
     attributes:
-      label: What technique was used to acquire the dataset?
+      label: Technique
       description: Select the technique used to acquire the dataset.
       options:
         - 4D-STEM
@@ -100,7 +115,7 @@ body:
   - type: input
     id: tags
     attributes:
-      label: Dataset Tags
+      label: Tags
       description: Please provide relevant tags for the dataset, separated by commas.
       placeholder: ex. Orientation Mapping, Nanocrystals, Ptychography, Strain Mapping
     validations:
