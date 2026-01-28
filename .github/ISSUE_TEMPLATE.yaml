@@ -1,10 +1,10 @@
 name: New Dataset
 description: Add a new dataset to the EM Database
 title: "[New Dataset]: "
-labels: ["new_dataset",]
+labels:
+  - "new_dataset"
 assignees:
   - CSSFrancis
-type: bug
 body:
   - type: markdown
     attributes:
@@ -37,7 +37,7 @@ body:
     validations:
       required: true
   - type: input
-    id: DetectorManufacturer
+    id: detector_manufacturer
     attributes:
       label: Detector Manufacturer
       description: Please provide the manufacturer of the detector used to acquire the dataset.
@@ -45,7 +45,7 @@ body:
     validations:
       required: false
   - type: input
-    id: Detector
+    id: detector_model
     attributes:
       label: Detector Model
       description: Please provide the model of the detector used to acquire the dataset.
@@ -53,39 +53,39 @@ body:
     validations:
       required: false
   - type: input
-    id: Vendor
+    id: microscope_vendor
     attributes:
-        label: Microscope Vendor
-        description: Please provide the vendor of the microscope used to acquire the dataset.
-        placeholder: ex. Thermo Fisher Scientific
+      label: Microscope Vendor
+      description: Please provide the vendor of the microscope used to acquire the dataset.
+      placeholder: ex. Thermo Fisher Scientific
     validations:
-        required: false
+      required: false
   - type: input
-    id: Microscope
+    id: microscope_model
     attributes:
-        label: Microscope Model
-        description: Please provide the model of the microscope used to acquire the dataset.
-        placeholder: ex. Gen 1 Titan
+      label: Microscope Model
+      description: Please provide the model of the microscope used to acquire the dataset.
+      placeholder: ex. Gen 1 Titan
     validations:
-        required: false
+      required: false
   - type: input
-    id: Voltage
+    id: accelerating_voltage
     attributes:
-        label: Accelerating Voltage
-        description: Please provide the accelerating voltage used to acquire the dataset (in kV).
-        placeholder: ex. 200 kV
+      label: Accelerating Voltage
+      description: Please provide the accelerating voltage used to acquire the dataset (in kV).
+      placeholder: ex. 200 kV
     validations:
-        required: false
+      required: false
   - type: input
-    id: License
+    id: license
     attributes:
-        label: Dataset License
-        description: Please provide the license under which the dataset is released.
-        placeholder: ex. CC-BY-4.0
+      label: Dataset License
+      description: Please provide the license under which the dataset is released.
+      placeholder: ex. CC-BY-4.0
     validations:
-        required: true
+      required: true
   - type: dropdown
-    id: Technique
+    id: technique
     attributes:
       label: What technique was used to acquire the dataset?
       description: Select the technique used to acquire the dataset.
@@ -98,10 +98,10 @@ body:
         - XEDS
         - Other
   - type: input
-    id: Tags
+    id: tags
     attributes:
       label: Dataset Tags
       description: Please provide relevant tags for the dataset, separated by commas.
-      placeholder: ex. Orientation Mapping, Nanocrystals
+      placeholder: ex. Orientation Mapping, Nanocrystals, Ptychography, Strain Mapping
     validations:
       required: false
