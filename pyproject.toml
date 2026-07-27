@@ -2,7 +2,13 @@
 name = "em-database"
 version = "0.1.0"
 description = "A database for electron microscopy data using pooch to download and manage files."
+readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Carter Francis", email = "cartsfrancis@gmail.com" },
+]
 dependencies = [
     "pooch",
     "pyyaml",
@@ -13,20 +19,37 @@ keywords = [
     "database",
     "materials science",
 ]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+
+[project.urls]
+Homepage = "https://cssfrancis.github.io/em_data/"
+Documentation = "https://cssfrancis.github.io/em_data/datasets.html"
+Repository = "https://github.com/CSSFrancis/em_data"
+Issues = "https://github.com/CSSFrancis/em_data/issues"
+
 [project.optional-dependencies]
 tests = ["pytest", "pytest-cov", "hyperspy", "quantem"]
 doc = ["sphinx", "sphinx-rtd-theme","sphinx-gallery", "quantem", "hyperspy","pydata_sphinx_theme","sphinx_design",]
 
 
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.package-data]
-em_database = ["*.pyi", "datasets/*.yaml", "datasets/*.yml"]
+em_database = ["*.pyi", "datasets/*.yaml", "datasets/*.yml", "datasets/*.json"]
 
 [tool.setuptools.packages.find]
 where = ["."]
