@@ -1,0 +1,20 @@
+# Secrets - never commit
+ZenodoTokenDONOTUPLOAD
+.zenodo_token
+*.token
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+
+# Docs
+doc/build/
+
+# Editors
+.idea/
+.vscode/
+.ipynb_checkpoints/
