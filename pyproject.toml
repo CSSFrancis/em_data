@@ -41,6 +41,15 @@ tests = ["pytest", "pytest-cov", "hyperspy", "quantem"]
 doc = ["sphinx", "sphinx-rtd-theme","sphinx-gallery", "quantem", "hyperspy","pydata_sphinx_theme","sphinx_design",]
 
 
+[tool.pytest.ini_options]
+# `slow` tests pull down the large datasets. They are deselected by default so
+# CI checks that every source URL resolves without moving hundreds of megabytes
+# on each of the six matrix legs. Run them with `pytest -m slow`.
+addopts = "-m 'not slow'"
+markers = [
+    "slow: downloads a large dataset; deselected by default",
+]
+
 [build-system]
 requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
