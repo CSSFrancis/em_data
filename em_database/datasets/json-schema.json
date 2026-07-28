@@ -67,6 +67,12 @@
         "license": {
           "type": "string"
         },
+        "technique": {
+          "type": "string"
+        },
+        "doi": {
+          "type": "string"
+        },
         "tags": {
           "type": "array",
           "items": {

@@ -5,7 +5,7 @@ NiEBSDLarge:
   source: https://raw.githubusercontent.com/pyxem/kikuchipy-data/bcab8f7a4ffdb86a97f14e2327a4813d3156a85e/nickel_ebsd_large/
   checksum: md5:51d6bc0f5ff23dcb0c1a8e1f4c52d4d4
   file: patterns_v2.h5
-  data_size: 500 mb
+  data_size: 15.4 MB
   detector_manufacturer: NORDIF
   detector: UF-1100
   technique: EBSD
