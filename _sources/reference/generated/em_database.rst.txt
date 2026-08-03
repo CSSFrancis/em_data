@@ -1,0 +1,25 @@
+﻿em\_database
+============
+
+.. automodule:: em_database
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_data_dir
+      reset_data_dir
+      set_data_dir
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   data
+   datasets
+   downloadable_dataset
+   tests
+   utils
