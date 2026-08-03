@@ -1,7 +1,7 @@
 # $schema: ../json-schema.json
 AmorphousFilm4nm4DSTEM:
   description: A 4D-STEM dataset of a 4 nm amorphous thin film acquired with a 2.5 mrad
-    probe on a Direct Electron Celeritas at 49000 fps. 256 x 256 probe positions (the
+    probe on a Direct Electron CeleritasXS at 49000 fps. 256 x 256 probe positions (the
     central quarter of a 1024 x 1024 scan) of 128 x 128 pixel diffraction patterns.
     Both real and reciprocal space are calibrated - 0.12325 nm per scan step and
     0.12453 1/nm per detector pixel, centred on the direct beam. Suitable for fluctuation
@@ -13,7 +13,7 @@ AmorphousFilm4nm4DSTEM:
   file: AmorphousFilm4nm4DSTEM.zspy
   data_size: 1.10 GB
   detector_manufacturer: Direct Electron
-  detector: Celeritas
+  detector: CeleritasXS
   license: CC-BY-4.0
   doi: 10.5281/zenodo.21632101
   technique: 4D-STEM
