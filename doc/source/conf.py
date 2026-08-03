@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 project = 'em_database'
 copyright = '2026, Carter Francis'
 author = 'Carter Francis'
-release = '0.2.0'
+release = '0.2.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
