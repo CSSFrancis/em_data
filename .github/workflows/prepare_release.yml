@@ -1,0 +1,188 @@
+name: prepare release
+
+# Cutting a release is deliberately two steps. This workflow does the mechanical
+# half: work out the next version, write it everywhere it is recorded, and open a
+# PR. Merging that PR and publishing a GitHub release is the human half - the
+# release event is what triggers publish.yml and uploads to PyPI.
+#
+# Two things to know about the PR this opens:
+#   - it is created with GITHUB_TOKEN, so it does not start build.yml. Close and
+#     reopen it if you want CI to run before merging.
+#   - it needs "Allow GitHub Actions to create and approve pull requests" under
+#     Settings > Actions, the same setting on_new_issue.yml relies on.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Part of the version to increment
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+      version:
+        description: Exact version to release, e.g. 0.2.0 (overrides the bump choice)
+        type: string
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    name: Bump the version and open a release PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the release notes are built from the log since the last tag
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Work out the new version
+        id: version
+        run: |
+          python - <<'PY'
+          import os, re, sys, tomllib
+
+          with open("pyproject.toml", "rb") as f:
+              current = tomllib.load(f)["project"]["version"]
+
+          match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", current)
+          if not match:
+              sys.exit(f"cannot bump {current!r}: expected MAJOR.MINOR.PATCH")
+          current_parts = tuple(int(part) for part in match.groups())
+
+          explicit = os.environ["VERSION"].strip().lstrip("v")
+          if explicit:
+              if not re.fullmatch(r"\d+\.\d+\.\d+", explicit):
+                  sys.exit(f"{explicit!r} is not MAJOR.MINOR.PATCH")
+              new = explicit
+          else:
+              major, minor, patch = current_parts
+              bump = os.environ["BUMP"]
+              if bump == "major":
+                  major, minor, patch = major + 1, 0, 0
+              elif bump == "minor":
+                  minor, patch = minor + 1, 0
+              else:
+                  patch += 1
+              new = f"{major}.{minor}.{patch}"
+
+          if tuple(int(part) for part in new.split(".")) <= current_parts:
+              sys.exit(f"{new} is not newer than the current version {current}")
+
+          print(f"{current} -> {new}")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"current={current}\nnew={new}\n")
+          PY
+        env:
+          BUMP: ${{ inputs.bump }}
+          VERSION: ${{ inputs.version }}
+
+      - name: Check the version is still free on PyPI
+        run: |
+          python - <<'PY'
+          import os, sys, urllib.error, urllib.request
+
+          new = os.environ["NEW"]
+          url = f"https://pypi.org/pypi/em-database/{new}/json"
+          try:
+              urllib.request.urlopen(url, timeout=30)
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise
+              print(f"{new} is not on PyPI yet")
+              sys.exit(0)
+          except urllib.error.URLError as error:
+              print(f"::warning::could not reach PyPI ({error.reason}), skipping the check")
+              sys.exit(0)
+          sys.exit(
+              f"em-database {new} is already on PyPI. A version can only ever be "
+              f"uploaded once, so pick a higher one."
+          )
+          PY
+        env:
+          NEW: ${{ steps.version.outputs.new }}
+
+      - name: Write the new version
+        run: |
+          python - <<'PY'
+          import os, pathlib, re, sys, tomllib
+
+          new = os.environ["NEW"]
+
+          # The version is recorded in two places. They have to move together or
+          # the built docs advertise a version that was never released.
+          edits = [
+              ("pyproject.toml", re.compile(r'^version = "[^"]*"', re.M), f'version = "{new}"'),
+              ("doc/source/conf.py", re.compile(r"^release = '[^']*'", re.M), f"release = '{new}'"),
+          ]
+          for name, pattern, replacement in edits:
+              path = pathlib.Path(name)
+              text, count = pattern.subn(replacement, path.read_text(encoding="utf-8"), count=1)
+              if count != 1:
+                  sys.exit(f"could not find the version line in {name}")
+              path.write_text(text, encoding="utf-8")
+              print(f"{name}: set to {new}")
+
+          with open("pyproject.toml", "rb") as f:
+              written = tomllib.load(f)["project"]["version"]
+          if written != new:
+              sys.exit(f"pyproject.toml parses as {written} after the edit, expected {new}")
+          PY
+        env:
+          NEW: ${{ steps.version.outputs.new }}
+
+      - name: Collect the changes since the last release
+        id: notes
+        run: |
+          previous=$(git tag --list 'v*' --sort=-v:refname | head -n 1)
+          if [ -z "$previous" ]; then
+            echo "no previous v* tag, using the full history"
+            range=""
+          else
+            echo "collecting commits since $previous"
+            range="$previous..HEAD"
+          fi
+          {
+            echo "notes<<NOTES_EOF"
+            git log --no-merges --pretty=format:'- %s' $range
+            echo ""
+            echo "NOTES_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open the release PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: release/v${{ steps.version.outputs.new }}
+          delete-branch: true
+          commit-message: "Release: Bump the version to ${{ steps.version.outputs.new }}"
+          title: "Release v${{ steps.version.outputs.new }}"
+          body: |
+            Bumps the version from `${{ steps.version.outputs.current }}` to
+            `${{ steps.version.outputs.new }}` in `pyproject.toml` and `doc/source/conf.py`.
+
+            ### Changes in this release
+
+            ${{ steps.notes.outputs.notes }}
+
+            ### To publish
+
+            1. Merge this PR.
+            2. [Draft a release](https://github.com/${{ github.repository }}/releases/new?tag=v${{ steps.version.outputs.new }}&title=v${{ steps.version.outputs.new }})
+               tagged `v${{ steps.version.outputs.new }}` against `main`.
+            3. Publishing it triggers `publish.yml`, which checks the tag against
+               `pyproject.toml` and uploads to PyPI.
+
+            CI does not start on this PR by itself - it was opened by a workflow. Close
+            and reopen it if you want build.yml to run before merging.
+
+            Opened by the `prepare release` workflow.
