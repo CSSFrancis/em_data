@@ -1,7 +1,7 @@
 # $schema: ../json-schema.json
 LayeredCuNb4DSTEM:
   description: A 4D-STEM dataset of a layered Cu/Nb nanolaminate, acquired with a nearly
-    parallel 1.58 mrad probe on a Direct Electron Celeritas XS. 128 x 128 probe positions
+    parallel 1.58 mrad probe on a Direct Electron CeleritasXS. 128 x 128 probe positions
     (the central quarter of a 512 x 512 raster scan) of 256 x 256 pixel diffraction patterns,
     each the sum of 32 camera frames at 25000 fps. Reciprocal space is calibrated at
     0.0078768 1/Angstrom per pixel and centred on the direct beam; the detector half-width
@@ -13,7 +13,7 @@ LayeredCuNb4DSTEM:
   file: LayeredCuNb4DSTEM.zspy
   data_size: 720.9 MB
   detector_manufacturer: Direct Electron
-  detector: Celeritas XS
+  detector: CeleritasXS
   voltage: 200 kV
   camera_length: 0.6 cm
   license: CC-BY-4.0

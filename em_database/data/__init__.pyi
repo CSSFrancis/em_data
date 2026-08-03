@@ -20,7 +20,7 @@ class AmorphousFilm4nm4DSTEM(DownloadableDataset):
     """
     AmorphousFilm4nm4DSTEM
     
-    A 4D-STEM dataset of a 4 nm amorphous thin film acquired with a 2.5 mrad probe on a Direct Electron Celeritas at 49000 fps. 256 x 256 probe positions (the central quarter of a 1024 x 1024 scan) of 128 x 128 pixel diffraction patterns. Both real and reciprocal space are calibrated - 0.12325 nm per scan step and 0.12453 1/nm per detector pixel, centred on the direct beam. Suitable for fluctuation electron microscopy and angular correlation analysis. Gain- and dark-corrected intensities were divided by 2 and rounded to uint16; multiply by 2 to recover ADU (the detector records 300 ADU per electron).
+    A 4D-STEM dataset of a 4 nm amorphous thin film acquired with a 2.5 mrad probe on a Direct Electron CeleritasXS at 49000 fps. 256 x 256 probe positions (the central quarter of a 1024 x 1024 scan) of 128 x 128 pixel diffraction patterns. Both real and reciprocal space are calibrated - 0.12325 nm per scan step and 0.12453 1/nm per detector pixel, centred on the direct beam. Suitable for fluctuation electron microscopy and angular correlation analysis. Gain- and dark-corrected intensities were divided by 2 and rounded to uint16; multiply by 2 to recover ADU (the detector records 300 ADU per electron).
 
     DOI: 10.5281/zenodo.21632101
 
@@ -148,7 +148,7 @@ class LayeredCuNb4DSTEM(DownloadableDataset):
     """
     LayeredCuNb4DSTEM
     
-    A 4D-STEM dataset of a layered Cu/Nb nanolaminate, acquired with a nearly parallel 1.58 mrad probe on a Direct Electron Celeritas XS. 128 x 128 probe positions (the central quarter of a 512 x 512 raster scan) of 256 x 256 pixel diffraction patterns, each the sum of 32 camera frames at 25000 fps. Reciprocal space is calibrated at 0.0078768 1/Angstrom per pixel and centred on the direct beam; the detector half-width is 1.008 1/Angstrom (25.3 mrad at 200 kV). The real-space scan step was not recorded by the scan controller, so the navigation axes are in pixels. Gain- and dark-corrected intensities were divided by 2 and rounded to uint16; multiply by 2 to recover ADU.
+    A 4D-STEM dataset of a layered Cu/Nb nanolaminate, acquired with a nearly parallel 1.58 mrad probe on a Direct Electron CeleritasXS. 128 x 128 probe positions (the central quarter of a 512 x 512 raster scan) of 256 x 256 pixel diffraction patterns, each the sum of 32 camera frames at 25000 fps. Reciprocal space is calibrated at 0.0078768 1/Angstrom per pixel and centred on the direct beam; the detector half-width is 1.008 1/Angstrom (25.3 mrad at 200 kV). The real-space scan step was not recorded by the scan controller, so the navigation axes are in pixels. Gain- and dark-corrected intensities were divided by 2 and rounded to uint16; multiply by 2 to recover ADU.
 
     DOI: 10.5281/zenodo.21632101
 
@@ -251,6 +251,23 @@ class NiEBSDLarge(DownloadableDataset):
     """
     ...
 
+class PdCuSiCrystallization(DownloadableDataset):
+    """
+    PdCuSiCrystallization
+    
+    A time resolved 4D-STEM series following the crystallization of a PdCuSi metallic glass, acquired on a Direct Electron CeleritasXS at 40000 fps with a 25 microsecond dwell time. 400 sequential scans of 47 x 39 probe positions (a 23.5 x 19.5 nm region cropped from a 256 x 256 scan) of 128 x 128 pixel diffraction patterns. Both real and reciprocal space are calibrated - 0.5 nm per scan step and 0.11 1/nm per detector pixel, centred on the direct beam. Successive scans are 1.6384 s apart and span 655.36 s of elapsed time, although the time axis is stored with a nm unit label. 24 GB of uint16 data uncompressed, chunked one time step at a time - the dataset used in the pyxem large data and lazy processing demo.
+
+    DOI: 10.5281/zenodo.15490547
+
+    License: CC-BY-4.0
+
+    You can download this dataset here:
+    https://zenodo.org/records/15490547/files
+
+
+    """
+    ...
+
 class PdNiPGlass(DownloadableDataset):
     """
     PdNiPGlass
@@ -296,4 +313,4 @@ class ZrNbPrecipitate(DownloadableDataset):
     """
     ...
 
-__all__ = __all__ + ['AlNanocrystals', 'AmorphousFilm4nm4DSTEM', 'ApoferritinApollo15eps', 'BilayerWS2', 'CuZnEELSMapping', 'CuZnHAADF', 'FeAlStripes', 'HREBSDStrainPatterns', 'InSituElectrochemGrowth', 'LayeredCuNb4DSTEM', 'LSMOLineScan', 'LSMOLineScanLowLoss', 'LSMOSTOLineScan', 'LSMOSTOLineScanLowLoss', 'MgONanoCrystals', 'NiEBSDLarge', 'PdNiPGlass', 'SPEDAg', 'ZrNbPrecipitate']
+__all__ = __all__ + ['AlNanocrystals', 'AmorphousFilm4nm4DSTEM', 'ApoferritinApollo15eps', 'BilayerWS2', 'CuZnEELSMapping', 'CuZnHAADF', 'FeAlStripes', 'HREBSDStrainPatterns', 'InSituElectrochemGrowth', 'LayeredCuNb4DSTEM', 'LSMOLineScan', 'LSMOLineScanLowLoss', 'LSMOSTOLineScan', 'LSMOSTOLineScanLowLoss', 'MgONanoCrystals', 'NiEBSDLarge', 'PdCuSiCrystallization', 'PdNiPGlass', 'SPEDAg', 'ZrNbPrecipitate']

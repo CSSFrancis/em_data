@@ -8,7 +8,7 @@ AlNanocrystals:
   detector_manufacturer: Direct Electron
   detector: CeleritasXS
   microscope_vendor: Thermo Fisher Scientific
-  microscope: Gen 1 Titan
+  microscope_model: Gen 1 Titan
   voltage: 200 kV
   license: CC-BY-4.0
   technique: 4D-STEM
