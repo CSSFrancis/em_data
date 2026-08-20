@@ -1,0 +1,15 @@
+em\_database.catalogue
+======================
+
+.. automodule:: em_database.catalogue
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      catalogue
+      datasets
+      entry
+      resolve
+   

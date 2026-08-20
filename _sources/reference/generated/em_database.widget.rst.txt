@@ -1,0 +1,20 @@
+em\_database.widget
+===================
+
+.. automodule:: em_database.widget
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      browse
+      card
+      settings_widget
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      DownloadCancelled
+   

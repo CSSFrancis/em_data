@@ -1,0 +1,30 @@
+em\_database.config
+===================
+
+.. automodule:: em_database.config
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DEFAULTS
+      settings
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_dir
+      config_path
+      data_dir
+      data_search_dirs
+      shared_data_dirs
+      system_config_path
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Settings
+   
