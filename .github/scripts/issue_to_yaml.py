@@ -1,7 +1,9 @@
-import sys
 import re
-import yaml
+import sys
 from pathlib import Path
+
+import yaml
+
 
 def parse_issue_body(text):
     # Simple regex-based parser for the fields
@@ -18,7 +20,7 @@ def parse_issue_body(text):
         "Accelerating Voltage": r"Accelerating Voltage\s*(.*)",
         "Dataset License": r"Dataset License\s*(.*)",
         "Technique": r"Technique\s*(.*)",
-        "Tags": r"Tags\s*(.*)"
+        "Tags": r"Tags\s*(.*)",
     }
     data = {}
     for key, pattern in fields.items():
@@ -29,11 +31,12 @@ def parse_issue_body(text):
             data[key] = ""
     return data
 
+
 def build_yaml(data):
     # Convert tags to list
     tags = [t.strip() for t in data["Tags"].split(",") if t.strip()]
     # Use author as dataset name (sanitize)
-    d_name = re.sub(r'\W+', '', data["Dataset Name"])
+    d_name = re.sub(r"\W+", "", data["Dataset Name"])
     yaml_data = {
         d_name: {
             "description": data["Description"],
@@ -46,12 +49,11 @@ def build_yaml(data):
             "license": data["Dataset License"],
             "technique": data["Technique"],
             "tags": tags,
-            "authors": {
-                data["Author"]: {}
-            }
+            "authors": {data["Author"]: {}},
         }
     }
     return yaml_data, dataset_name
+
 
 if __name__ == "__main__":
     issue_file = sys.argv[1]

@@ -20,13 +20,21 @@ import pytest
 
 import em_database.data as data
 from em_database.data import MgONanoCrystals, NiEBSDLarge
-from em_database.downloadable_dataset import DownloadFuture
+from em_database.downloadable_dataset import (
+    _PENDING,
+    DatasetPath,
+    DownloadableDataset,
+    _pending_key,
+)
 
 try:
-    from quantem.core.io.file_readers import read_4dstem
+    from quantem.core.io.file_readers import (  # pyright: ignore[reportMissingImports]
+        read_4dstem,
+    )
 
     QUANTEM_AVAILABLE = True
 except ImportError:
+    read_4dstem = None
     QUANTEM_AVAILABLE = False
 
 # The smallest file in the index (34 kB). Used wherever a test needs a real
@@ -70,8 +78,7 @@ def test_metadata_is_complete(name):
     assert dataset.file, f"{name} has no file"
     assert dataset.description, f"{name} has no description"
     assert dataset.checksum and dataset.checksum.startswith("md5:"), (
-        f"{name} has no md5 checksum, so a corrupt or truncated download "
-        f"would go unnoticed"
+        f"{name} has no md5 checksum, so a corrupt or truncated download would go unnoticed"
     )
 
 
@@ -80,8 +87,10 @@ def test_download_verifies_checksum(tmp_path):
     dataset = getattr(data, TINY_DATASET)()
     path = dataset.download(destination=tmp_path, progressbar=False, background=False)
     assert (tmp_path / dataset.file).exists()
-    assert isinstance(path, str)
-    assert path == str(tmp_path / dataset.file)
+    assert isinstance(path, DatasetPath)
+    assert isinstance(path, Path)
+    assert path.done is True  # nothing pending, so the handle needs no waiting
+    assert path == tmp_path / dataset.file
 
 
 def test_download_default_returns_path_handle(tmp_path):
@@ -89,13 +98,13 @@ def test_download_default_returns_path_handle(tmp_path):
     that is a real ``Path`` and resolves to the downloaded file."""
     dataset = getattr(data, TINY_DATASET)()
     handle = dataset.download(destination=tmp_path, progressbar=False)
-    assert isinstance(handle, DownloadFuture)
+    assert isinstance(handle, DatasetPath)
     assert isinstance(handle, Path)
     # Using it as a path blocks until the bytes are there, then behaves normally.
     assert os.fspath(handle) == str(tmp_path / dataset.file)
     assert handle.is_file()
     assert (tmp_path / dataset.file).exists()
-    assert handle.done()
+    assert handle.done
 
 
 def test_download_handle_is_nonblocking_then_blocks_on_use(tmp_path, monkeypatch):
@@ -113,12 +122,84 @@ def test_download_handle_is_nonblocking_then_blocks_on_use(tmp_path, monkeypatch
     monkeypatch.setattr(dataset, "_retrieve", slow_retrieve)
     handle = dataset.download(destination=tmp_path, progressbar=False)
 
-    assert started.wait(2)                       # the worker thread really started
-    assert handle.done() is False                # returned without waiting for it
+    assert started.wait(2)  # the worker thread really started
+    assert handle.done is False  # returned without waiting for it
     assert not (tmp_path / dataset.file).exists()
     # Consuming the path blocks until the worker finishes, then resolves.
     assert Path(os.fspath(handle)).read_bytes() == b"payload"
-    assert handle.done() is True
+    assert handle.done is True
+
+
+def test_download_handle_derived_paths_also_wait(tmp_path, monkeypatch):
+    """A path rebuilt from the handle names the same file, so it must wait too."""
+    dataset = getattr(data, TINY_DATASET)()
+    started = threading.Event()
+
+    def slow_retrieve(destination=None, progressbar=True, chunk_size=4096):
+        started.set()
+        time.sleep(0.4)
+        target = tmp_path / dataset.file
+        target.write_bytes(b"payload")
+        return str(target)
+
+    monkeypatch.setattr(dataset, "_retrieve", slow_retrieve)
+    handle = dataset.download(destination=tmp_path, progressbar=False)
+    assert started.wait(2)
+
+    derived = handle.parent / handle.name
+    assert derived is not handle
+    assert derived.done is False
+    assert Path(os.fspath(derived)).read_bytes() == b"payload"
+
+
+def test_a_path_that_is_not_downloading_never_waits(tmp_path, monkeypatch):
+    """Only the file being fetched is pending - its directory is not."""
+    dataset = getattr(data, TINY_DATASET)()
+
+    def slow_retrieve(destination=None, progressbar=True, chunk_size=4096):
+        time.sleep(0.3)
+        target = tmp_path / dataset.file
+        target.write_bytes(b"payload")
+        return str(target)
+
+    monkeypatch.setattr(dataset, "_retrieve", slow_retrieve)
+    handle = dataset.download(destination=tmp_path, progressbar=False)
+    assert handle.parent.done is True
+    handle.wait()
+
+
+def test_finished_downloads_leave_no_pending_entry(tmp_path):
+    dataset = getattr(data, TINY_DATASET)()
+    handle = dataset.download(destination=tmp_path, progressbar=False)
+    handle.wait()
+    key = _pending_key(handle)
+    # the done-callback that clears the entry runs just after result() returns
+    for _ in range(200):
+        if key not in _PENDING:
+            break
+        time.sleep(0.01)
+    assert key not in _PENDING
+
+
+def test_generated_class_can_be_subclassed():
+    base = getattr(data, TINY_DATASET)
+
+    class Subclass(base):
+        pass
+
+    assert Subclass().file == base().file
+
+
+def test_keyword_overrides_leave_the_class_spec_alone():
+    base = getattr(data, TINY_DATASET)
+    overridden = base(checksum="md5:" + "0" * 32)
+    assert overridden.checksum == "md5:" + "0" * 32
+    assert base().checksum != overridden.checksum
+
+
+def test_a_dataset_without_a_source_is_an_error():
+    with pytest.raises(TypeError):
+        DownloadableDataset()
 
 
 def test_download_handle_propagates_errors(tmp_path):
@@ -165,6 +246,7 @@ def test_download_mgo_nanocrystals(tmp_path):
 @pytest.mark.slow
 @pytest.mark.skipif(not QUANTEM_AVAILABLE, reason="quantem is not installed")
 def test_quantem_loading(tmp_path):
+    assert read_4dstem is not None
     dataset = MgONanoCrystals()
     file_path = dataset.download(destination=tmp_path, progressbar=False, background=False)
     read_4dstem(file_path)

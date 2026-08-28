@@ -4,6 +4,7 @@ The catalogue tests need no network (they only instantiate the dataset classes
 and read declared metadata). The widget tests need ``anywidget``; the one real
 download is marked ``slow``.
 """
+
 import threading
 
 import pytest
@@ -17,6 +18,7 @@ TINY_DATASET = "CuZnHAADF"  # 34 kB - the smallest file in the index
 # ---------------------------------------------------------------------------
 # catalogue
 # ---------------------------------------------------------------------------
+
 
 def test_catalogue_groups_and_orders_by_technique():
     cat = catalogue.catalogue()
@@ -33,18 +35,48 @@ def test_catalogue_groups_and_orders_by_technique():
 
 def test_catalogue_entry_has_expected_fields():
     ds = catalogue.resolve(TINY_DATASET)
+    assert ds is not None
     row = catalogue.entry(TINY_DATASET, ds)
-    for key in ("name", "technique", "size", "downloaded", "path", "description",
-                "detector", "microscope", "voltage", "tags", "source", "file"):
+    for key in (
+        "name",
+        "technique",
+        "size",
+        "downloaded",
+        "path",
+        "description",
+        "detector",
+        "microscope",
+        "voltage",
+        "tags",
+        "source",
+        "file",
+    ):
         assert key in row
     assert row["name"] == TINY_DATASET
     assert row["technique"] == "STEM"
     assert isinstance(row["downloaded"], bool)
 
 
+def test_catalogue_entry_reports_where_the_file_came_from(tmp_path, monkeypatch):
+    shared, user = tmp_path / "shared", tmp_path / "user"
+    shared.mkdir()
+    user.mkdir()
+    monkeypatch.setenv("EM_DATABASE_SHARED_DIR", str(shared))
+    em_database.set_data_dir(str(user), persist=False)
+
+    ds = catalogue.resolve(TINY_DATASET)
+    assert ds is not None
+    assert catalogue.entry(TINY_DATASET, ds)["location"] is None
+    (user / ds.file).write_bytes(b"x")
+    assert catalogue.entry(TINY_DATASET, ds)["location"] == "user"
+    (shared / ds.file).write_bytes(b"x")
+    assert catalogue.entry(TINY_DATASET, ds)["location"] == "shared"
+
+
 def test_catalogue_downloaded_flag_tracks_the_file(tmp_path):
     em_database.set_data_dir(str(tmp_path), persist=False)
     ds = catalogue.resolve(TINY_DATASET)
+    assert ds is not None
     assert catalogue.entry(TINY_DATASET, ds)["downloaded"] is False
     (tmp_path / ds.file).write_bytes(b"x")  # pretend it is downloaded
     assert catalogue.entry(TINY_DATASET, ds)["downloaded"] is True
@@ -53,6 +85,7 @@ def test_catalogue_downloaded_flag_tracks_the_file(tmp_path):
 # ---------------------------------------------------------------------------
 # widget
 # ---------------------------------------------------------------------------
+
 
 def _browser():
     pytest.importorskip("anywidget")
@@ -106,24 +139,32 @@ def test_command_update_routes_through_real_comm_handler(monkeypatch):
     widget = _browser()
     got = []
     monkeypatch.setattr(widget, "_start_download", lambda name: got.append(name))
-    msg = {"content": {"data": {"method": "update",
-            "state": {"_command": {"action": "download", "name": "X", "nonce": 1}}}},
-           "buffers": []}
+    msg = {
+        "content": {
+            "data": {
+                "method": "update",
+                "state": {"_command": {"action": "download", "name": "X", "nonce": 1}},
+            }
+        },
+        "buffers": [],
+    }
     widget._handle_msg(msg)  # the real ipywidgets handler
     assert got == ["X"]
 
 
 def test_search_blob_includes_authors_and_affiliation():
     ds = catalogue.resolve("BilayerWS2")
+    assert ds is not None
     row = catalogue.entry("BilayerWS2", ds)
-    assert "nick hagopian" in row["search"]      # author name
-    assert "wisconsin" in row["search"]          # author affiliation
-    assert "4d-stem" in row["search"]            # technique
+    assert "nick hagopian" in row["search"]  # author name
+    assert "wisconsin" in row["search"]  # author affiliation
+    assert "4d-stem" in row["search"]  # technique
 
 
 def test_delete_removes_downloaded_file(tmp_path):
     em_database.set_data_dir(str(tmp_path), persist=False)
     ds = catalogue.resolve(TINY_DATASET)
+    assert ds is not None
     (tmp_path / ds.file).write_bytes(b"x")
     assert ds.filepath() is not None
     assert ds.delete() is True
@@ -160,6 +201,7 @@ def test_dataset_card_is_populated_and_routes(monkeypatch):
     from em_database.widget import card
 
     ds = catalogue.resolve(TINY_DATASET)
+    assert ds is not None
     widget = card(ds)
     assert widget.info["name"] == TINY_DATASET
     assert widget.info["technique"] == "STEM"
@@ -172,8 +214,10 @@ def test_dataset_card_is_populated_and_routes(monkeypatch):
 def test_dataset_display_is_a_widget_card():
     pytest.importorskip("anywidget")
     ds = catalogue.resolve(TINY_DATASET)
+    assert ds is not None
     bundle = ds._repr_mimebundle_()
     mimes = bundle[0] if isinstance(bundle, tuple) else bundle
+    assert mimes is not None
     assert "application/vnd.jupyter.widget-view+json" in mimes
 
 
@@ -185,7 +229,9 @@ def test_dataset_display_falls_back_without_anywidget(monkeypatch):
 
     monkeypatch.setattr(widget_mod, "card", _boom)
     ds = catalogue.resolve(TINY_DATASET)
+    assert ds is not None
     bundle = ds._repr_mimebundle_()
+    assert bundle is not None
     assert "text/plain" in bundle
 
 
@@ -195,16 +241,16 @@ def test_settings_widget_edits_and_persists(tmp_path):
     from em_database.widget import settings_widget
 
     widget = settings_widget()
-    assert widget.data_dir == em_database.get_data_dir()
+    assert widget.data_dir == str(em_database.get_data_dir())
 
     widget._command = {"action": "save", "data_dir": str(tmp_path / "d"), "nonce": 1}
-    assert em_database.get_data_dir() == str(tmp_path / "d")
-    assert config._read_file()["data_dir"] == str(tmp_path / "d")   # persisted
+    assert em_database.get_data_dir() == tmp_path / "d"
+    assert config._read_file()["data_dir"] == str(tmp_path / "d")  # persisted
     assert widget.data_dir == str(tmp_path / "d")
 
     widget._command = {"action": "session", "data_dir": str(tmp_path / "s"), "nonce": 2}
-    assert em_database.get_data_dir() == str(tmp_path / "s")
-    assert config._read_file()["data_dir"] == str(tmp_path / "d")   # NOT persisted
+    assert em_database.get_data_dir() == tmp_path / "s"
+    assert config._read_file()["data_dir"] == str(tmp_path / "d")  # NOT persisted
 
     widget._command = {"action": "reset", "nonce": 3}
     assert em_database.get_data_dir() == config._default_data_dir()
@@ -214,6 +260,7 @@ def test_settings_display_is_a_widget():
     pytest.importorskip("anywidget")
     bundle = em_database.settings._repr_mimebundle_()
     mimes = bundle[0] if isinstance(bundle, tuple) else bundle
+    assert mimes is not None
     assert "application/vnd.jupyter.widget-view+json" in mimes
 
 
@@ -221,15 +268,17 @@ def test_notebook_detection_and_colab_enable_are_safe():
     """The frontend helpers must be no-ops off a notebook (e.g. under pytest),
     so nothing breaks when em_database is imported in plain Python."""
     import em_database.widget as widget_mod
+
     assert widget_mod._in_notebook() is False
     widget_mod._enable_colab_widgets()  # must not raise when not on Colab
-    widget_mod._prepare_frontend()      # idempotent, safe
+    widget_mod._prepare_frontend()  # idempotent, safe
 
 
 def test_attach_toast_is_noop_outside_jupyter():
     """Outside a Jupyter kernel there is no toast, so a bare download is
     unaffected."""
     import em_database.widget as widget_mod
+
     monitor, finish = widget_mod._attach_toast("Foo")
     assert monitor is None and finish is None
 
@@ -246,17 +295,19 @@ def test_download_toasts_plumbing():
     monitor, token = toasts.begin("Foo")
     assert toasts.downloads[token] == {"label": "Foo", "done": 0, "total": 0}
 
-    ok = Future(); ok.set_result("path")
-    toasts.finish(token, ok)                       # success -> toast cleared
+    ok = Future()
+    ok.set_result("path")
+    toasts.finish(token, ok)  # success -> toast cleared
     assert token not in toasts.downloads
 
-    monitor2, token2 = toasts.begin("Bar")         # cancel sets the event
+    monitor2, token2 = toasts.begin("Bar")  # cancel sets the event
     toasts._command = {"action": "cancel", "token": token2, "nonce": 1}
     assert monitor2._cancel.is_set()
 
-    bad = Future(); bad.set_exception(RuntimeError("boom"))
+    bad = Future()
+    bad.set_exception(RuntimeError("boom"))
     _, token3 = toasts.begin("Baz")
-    toasts.finish(token3, bad)                      # failure -> error toast
+    toasts.finish(token3, bad)  # failure -> error toast
     assert toasts.downloads[token3]["error"] == "boom"
 
 
@@ -268,4 +319,5 @@ def test_widget_download_end_to_end(tmp_path):
     assert future is not None
     future.result(timeout=120)  # block until the background download finishes
     ds = catalogue.resolve(TINY_DATASET)
+    assert ds is not None
     assert (tmp_path / ds.file).exists()

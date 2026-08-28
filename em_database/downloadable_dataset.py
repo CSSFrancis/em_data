@@ -1,17 +1,33 @@
+import os
 import threading
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, ClassVar, Protocol
 
 import pooch
-import os
+
+
+class Progress(Protocol):
+    """What pooch drives while streaming a file, and what the widgets provide."""
+
+    @property
+    def total(self) -> int: ...
+
+    @total.setter
+    def total(self, value: int) -> None: ...
+
+    def update(self, n: int) -> None: ...
+
+    def reset(self) -> None: ...
+
+    def close(self) -> None: ...
 
 
 # A single, lazily-created thread pool shared by every dataset. Background
 # downloads run here so that a notebook cell returns immediately instead of
 # blocking on the network. It is created on first use so that simply importing
 # the package costs nothing.
-_executor: Optional[ThreadPoolExecutor] = None
+_executor: ThreadPoolExecutor | None = None
 _executor_lock = threading.Lock()
 
 
@@ -35,9 +51,26 @@ def _get_executor() -> ThreadPoolExecutor:
 # the download path — but a Path subclass does.
 _ConcretePath = type(Path())
 
+# Downloads in flight, keyed by the destination path. Keeping this off the
+# instance is what makes a derived path behave: pathlib builds a brand new
+# object for ``handle.parent / handle.name``, and an instance attribute would
+# not survive that, so the copy would report itself finished and never wait.
+_PENDING: dict[str, "Future[Path]"] = {}
+_PENDING_LOCK = threading.Lock()
 
-class DownloadFuture(_ConcretePath):
-    """The path to a dataset that is downloading on a background thread.
+
+def _pending_key(path: object) -> str:
+    return os.path.normcase(os.path.abspath(str(path)))
+
+
+def _release_pending(key: str, future: "Future[Path]") -> None:
+    with _PENDING_LOCK:
+        if _PENDING.get(key) is future:
+            del _PENDING[key]
+
+
+class DatasetPath(_ConcretePath):
+    """The local path to a dataset, which may still be downloading.
 
     It is a genuine :class:`pathlib.Path` pointing at the file's final location
     (known before the download starts), so it can be passed anywhere a path is
@@ -46,69 +79,83 @@ class DownloadFuture(_ConcretePath):
     every file reader ultimately goes through) it blocks until the download has
     finished, re-raising any error that occurred.
 
-    For explicit control it also behaves like a future: ``done()`` checks status
-    without blocking, ``result()``/``wait()`` block until the file is ready.
+    ``done`` reports status without blocking; ``result()``/``wait()`` block
+    until the file is ready. A path to a file that is already on disk is simply
+    one that is already done, so :meth:`DownloadableDataset.download` returns
+    this type whether or not it downloaded anything.
+
+    Any path pointing at the same file waits, however it was built. ``str()``
+    and ``Path()`` are the exceptions: they hand back a plain value with no
+    download attached, so ``hs.load(str(handle))`` will not block.
     """
 
-    def _attach(self, future: "Future[str]") -> "DownloadFuture":
-        self._future = future
+    @property
+    def _future(self) -> "Future[Path] | None":
+        return _PENDING.get(_pending_key(self))
+
+    def _attach(self, future: "Future[Path]") -> "DatasetPath":
+        key = _pending_key(self)
+        with _PENDING_LOCK:
+            _PENDING[key] = future
+        future.add_done_callback(lambda finished: _release_pending(key, finished))
         return self
 
     def __fspath__(self) -> str:
         # is_file()/exists()/stat()/open() and every os.fspath() consumer route
         # through here, so blocking here makes all of them wait for the bytes.
-        future = getattr(self, "_future", None)
+        future = self._future
         if future is not None:
             future.result()  # blocks; re-raises a failed download
         return str(self)
 
-    def result(self, timeout: Optional[float] = None) -> str:
+    def result(self, timeout: float | None = None) -> Path:
         """Block until the download finishes and return the file path."""
-        future = getattr(self, "_future", None)
+        future = self._future
         if future is not None:
             future.result(timeout)
-        return str(self)
+        return Path(str(self))
 
+    @property
     def done(self) -> bool:
-        """Return True if the download has finished (without blocking)."""
-        future = getattr(self, "_future", None)
+        """Whether the download has finished. Never blocks."""
+        future = self._future
         return future.done() if future is not None else True
 
-    def wait(self, timeout: Optional[float] = None) -> "DownloadFuture":
+    def wait(self, timeout: float | None = None) -> "DatasetPath":
         """Block until the download finishes and return self (for chaining)."""
         self.result(timeout)
         return self
 
     def __repr__(self) -> str:  # never block just to display the object
-        state = "done" if self.done() else "downloading"
-        return f"<DownloadFuture {str(self)!r} [{state}]>"
+        state = "done" if self.done else "downloading"
+        return f"<DatasetPath {str(self)!r} [{state}]>"
 
 
 class DownloadableDataset:
+    """A downloadable dataset, described by the YAML entry in :attr:`_spec`.
 
-    def __init__(self,
-                 source: str,
-                 file: str,
-                 checksum:str=None,
-                 license:str=None,
-                 quality:str=None,
-                 data_size:str=None,
-                 doi:str=None,
-                 description:str=None,
-                 detector:Optional[str]=None,
-                 detector_manufacturer:Optional[str]=None,
-                 **kwargs):
-        self.source = source
-        self.file = file
-        self.checksum = checksum
-        self.license = license
-        self.quality = quality
-        self.doi = doi
-        self.data_size = data_size
-        self.description = description
-        self.metadata = kwargs
-        self.detector_manufacturer = detector_manufacturer
-        self.detector = detector
+    The generated subclasses in :mod:`em_database.data` carry their entry as
+    ``_spec``; keyword arguments override it for a single instance.
+    """
+
+    _spec: ClassVar[dict[str, Any]] = {}
+
+    def __init__(self, **overrides: Any):
+        spec = {**self._spec, **overrides}
+        try:
+            self.source = spec.pop("source")
+            self.file = spec.pop("file")
+        except KeyError as error:
+            raise TypeError(f"a dataset needs a {error} entry") from None
+        self.checksum = spec.pop("checksum", None)
+        self.license = spec.pop("license", None)
+        self.quality = spec.pop("quality", None)
+        self.doi = spec.pop("doi", None)
+        self.data_size = spec.pop("data_size", None)
+        self.description = spec.pop("description", None)
+        self.detector_manufacturer = spec.pop("detector_manufacturer", None)
+        self.detector = spec.pop("detector", None)
+        self.metadata = spec
 
     def __repr__(self):
         return f"<{self.__class__} url={self.source}/{self.file} bytes={self.data_size}>"
@@ -120,25 +167,29 @@ class DownloadableDataset:
         """
         try:
             from em_database.widget import card
+
             widget = card(self)
         except Exception:
             return {"text/plain": repr(self)}
         return widget._repr_mimebundle_(**kwargs)
 
     @staticmethod
-    def _resolve_destination(destination: str | None) -> str:
+    def _resolve_destination(destination: str | os.PathLike | None) -> Path:
         """Return the directory the dataset should live in."""
         if destination is None:
             from em_database import config
-            return config.data_dir()
-        return destination
 
-    def download(self,
-                 destination: str | None = None,
-                 progressbar:bool = True,
-                 chunk_size:int =4096,
-                 background:bool = True) -> Union[str, DownloadFuture]:
-        """ Download the dataset to the specified destination if not already present.
+            return config.data_dir()
+        return Path(destination)
+
+    def download(
+        self,
+        destination: str | os.PathLike | None = None,
+        progressbar: bool | Progress = True,
+        chunk_size: int = 4096,
+        background: bool = True,
+    ) -> DatasetPath:
+        """Download the dataset to the specified destination if not already present.
 
         By default, this will download to the defined emdata.data_dir directory. You can set
         a custom default download directory with emdata.data_dir = 'your/path/here' which will
@@ -149,7 +200,7 @@ class DownloadableDataset:
 
         Parameters
         ----------
-        destination : str, optional
+        destination : str or Path, optional
             The directory to download the dataset to. If None, uses the default emdata.data_dir
             directory, by default None.
         progressbar : bool, optional
@@ -160,49 +211,48 @@ class DownloadableDataset:
         background : bool, optional
             If True (the default), the download runs on a background thread and this
             returns immediately so a Jupyter cell stays responsive. The returned
-            :class:`DownloadFuture` is a real path pointing at the file's final
+            :class:`DatasetPath` is a real path pointing at the file's final
             location, so you can hand it straight to a loader
             (``hs.load(dataset.download())``): it blocks only at the point the file
-            is actually opened. Use ``.done()`` to poll and ``.result()`` to wait
-            explicitly. If False, the download blocks and returns the file path as a
-            plain string, exactly as before.
+            is actually opened. Use ``.done`` to poll and ``.result()`` to wait
+            explicitly. If False, the download blocks until the file is there.
 
         Returns
         -------
-        str or DownloadFuture
-            When ``background`` is False, the local path to the downloaded file as a
-            string. When ``background`` is True (the default), a :class:`DownloadFuture`
-            path handle for the same location that resolves once the download finishes.
+        DatasetPath
+            The local path to the file, as a :class:`pathlib.Path` subclass that also
+            reports download state. With ``background`` False it is already done.
         """
         if not background:
-            return self._retrieve(destination, progressbar, chunk_size)
+            return DatasetPath(self._retrieve(destination, progressbar, chunk_size))
         # Resolve where the file will end up: an existing shared/user copy if it
         # is already present, otherwise the user's download location.
         if destination is not None:
-            target = os.path.join(destination, self.file)
+            target = Path(destination) / self.file
         else:
-            target = self.filepath() or os.path.join(self._resolve_destination(None), self.file)
+            target = self.filepath() or self._resolve_destination(None) / self.file
         # In Jupyter (with the widget installed) a background download pops a
         # cancelable toast; the toast's monitor replaces the plain progress bar.
         monitor = finish = None
         if progressbar:
             try:
                 from em_database.widget import _attach_toast
+
                 monitor, finish = _attach_toast(type(self).__name__)
             except Exception:
                 monitor = finish = None
         progress = monitor if monitor is not None else progressbar
-        future = _get_executor().submit(
-            self._retrieve, destination, progress, chunk_size
-        )
+        future = _get_executor().submit(self._retrieve, destination, progress, chunk_size)
         if finish is not None:
             future.add_done_callback(finish)
-        return DownloadFuture(target)._attach(future)
+        return DatasetPath(target)._attach(future)
 
-    def _retrieve(self,
-                  destination: str | None = None,
-                  progressbar: bool = True,
-                  chunk_size: int = 4096) -> str:
+    def _retrieve(
+        self,
+        destination: str | os.PathLike | None = None,
+        progressbar: bool | Progress = True,
+        chunk_size: int = 4096,
+    ) -> Path:
         """Fetch the file and return its local path (blocking).
 
         With no explicit destination, an existing system-wide/shared copy is used
@@ -224,45 +274,49 @@ class DownloadableDataset:
             destination = self._resolve_destination(destination)
         # Instantiate an Http downloader with a custom user agent
         headers = {"User-Agent": "em_database (https://github.com/CSSFrancis/em_data)"}
-        downloader = pooch.HTTPDownloader(progressbar=progressbar,
-                                          chunk_size=chunk_size,
-                                          headers= headers)
+        downloader = pooch.HTTPDownloader(
+            progressbar=progressbar,  # pyright: ignore[reportArgumentType]
+            chunk_size=chunk_size,
+            headers=headers,
+        )
         filepath = pooch.retrieve(
-            url=self.source +"/"+ self.file,
+            url=self.source + "/" + self.file,
             known_hash=self.checksum,
             fname=self.file,
             path=destination,
-            downloader=downloader
+            downloader=downloader,  # pyright: ignore[reportArgumentType]
         )
-        return filepath
+        return Path(filepath)
 
-    def _find_shared(self) -> str | None:
+    def _find_shared(self) -> Path | None:
         """Path to an existing copy in a shared/system data dir, or None."""
         from em_database import config
+
         for directory in config.shared_data_dirs():
-            candidate = os.path.join(directory, self.file)
-            if os.path.exists(candidate):
+            candidate = directory / self.file
+            if candidate.exists():
                 return candidate
         return None
 
-    def filepath(self) -> str:
-        """ Return the local file path of the dataset if present.
+    def filepath(self) -> Path | None:
+        """Return the local file path of the dataset if present.
 
         Looks in the shared/system data locations first, then the user's data
-        directory. Returns None if the dataset is not downloaded anywhere. """
+        directory. Returns None if the dataset is not downloaded anywhere."""
         from em_database import config
+
         for directory in config.data_search_dirs():
-            candidate = os.path.join(directory, self.file)
-            if os.path.exists(candidate):
+            candidate = directory / self.file
+            if candidate.exists():
                 return candidate
         return None
 
     def delete(self, destination: str | None = None) -> bool:
-        """ Delete the downloaded file if it is present.
+        """Delete the downloaded file if it is present.
 
         Parameters
         ----------
-        destination : str, optional
+        destination : str or Path, optional
             The directory the dataset was downloaded to. If None, uses the
             default emdata.data_dir directory, by default None.
 
@@ -271,8 +325,8 @@ class DownloadableDataset:
         bool
             True if a file was removed, False if there was nothing to delete.
         """
-        path = os.path.join(self._resolve_destination(destination), self.file)
-        if os.path.exists(path):
-            os.remove(path)
+        path = self._resolve_destination(destination) / self.file
+        if path.exists():
+            path.unlink()
             return True
         return False

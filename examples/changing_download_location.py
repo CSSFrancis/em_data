@@ -24,7 +24,7 @@ print("Session directory:", em_database.get_data_dir())
 # Change it and remember the choice across sessions (writes
 # ``~/.em_database/settings.yaml``). ``set_data_dir`` persists by default; the
 # equivalent low-level form is ``em_database.settings[...] = ...; save()``.
-em_database.set_data_dir("/big/disk/em_data")            # set + persist
+em_database.set_data_dir("/big/disk/em_data")  # set + persist
 # em_database.settings["data_dir"] = "/big/disk/em_data"  # the same thing
 # em_database.settings.save()
 print("Persisted directory:", em_database.get_data_dir())

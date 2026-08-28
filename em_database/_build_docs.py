@@ -1,7 +1,8 @@
 import json
-import yaml
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
+
+import yaml
 
 
 def parse_datasets(yaml_dir):
@@ -9,21 +10,23 @@ def parse_datasets(yaml_dir):
     datasets_by_technique = defaultdict(list)
 
     for yaml_file in Path(yaml_dir).glob("*.yaml"):
-        with open(yaml_file, 'r') as f:
+        with open(yaml_file, "r") as f:
             data = yaml.safe_load(f)
 
         for name, info in data.items():
-            technique = info.get('technique', 'Unknown')
-            datasets_by_technique[technique].append({
-                'name': name,
-                'description': info.get('description', ''),
-                'tags': info.get('tags', []),
-                'source': info.get('source', ''),
-                'file': info.get('file', ''),
-                'license': info.get('license', ''),
-                'detector': info.get('detector', 'Unknown'),
-                'detector_manufacturer': info.get('detector_manufacturer', 'Unknown')
-            })
+            technique = info.get("technique", "Unknown")
+            datasets_by_technique[technique].append(
+                {
+                    "name": name,
+                    "description": info.get("description", ""),
+                    "tags": info.get("tags", []),
+                    "source": info.get("source", ""),
+                    "file": info.get("file", ""),
+                    "license": info.get("license", ""),
+                    "detector": info.get("detector", "Unknown"),
+                    "detector_manufacturer": info.get("detector_manufacturer", "Unknown"),
+                }
+            )
 
     return dict(datasets_by_technique)
 
@@ -39,10 +42,10 @@ def generate_html_table(datasets_by_technique):
         tags = set()
         detectors = {}
         for dataset in datasets:
-            tags.update(dataset['tags'])
-            all_tags.update(dataset['tags'])
-            manufacturer = dataset.get('detector_manufacturer', 'Unknown')
-            detector = dataset.get('detector', 'Unknown')
+            tags.update(dataset["tags"])
+            all_tags.update(dataset["tags"])
+            manufacturer = dataset.get("detector_manufacturer", "Unknown")
+            detector = dataset.get("detector", "Unknown")
 
             if manufacturer not in detectors:
                 detectors[manufacturer] = set()
@@ -57,58 +60,58 @@ def generate_html_table(datasets_by_technique):
 
     all_detectors = {m: sorted(d) for m, d in all_detectors.items()}
 
-    technique_tags_json = __import__('json').dumps(technique_tags)
-    technique_detectors_json = __import__('json').dumps(technique_detectors)
+    technique_tags_json = __import__("json").dumps(technique_tags)
+    technique_detectors_json = __import__("json").dumps(technique_detectors)
     all_tags_sorted = sorted(all_tags)
-    all_detectors_json = __import__('json').dumps(all_detectors)
+    all_detectors_json = __import__("json").dumps(all_detectors)
 
-    html = f"""
+    html = """
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
         <style>
-            :root {{
+            :root {
                 color-scheme: light dark;
-            }}
-            body {{ 
+            }
+            body { 
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
                 margin: 0; 
                 padding: 20px; 
                 background: transparent; 
                 color: inherit; 
-            }}
-            table {{ 
+            }
+            table { 
                 border-collapse: collapse; 
                 width: 100%; 
                 border: 1px solid light-dark(#ddd, #444); 
-            }}
-            th, td {{ 
+            }
+            th, td { 
                 border: 1px solid light-dark(#ddd, #444); 
                 padding: 12px 8px; 
                 text-align: left; 
-            }}
-            th {{ 
+            }
+            th { 
                 background-color: light-dark(#f5f5f5, #2d2d2d); 
                 font-weight: 600; 
                 position: relative; 
-            }}
-            tr:nth-child(even) {{ 
+            }
+            tr:nth-child(even) { 
                 background-color: light-dark(#f9f9f9, #252525); 
-            }}
-            tr:hover {{ 
+            }
+            tr:hover { 
                 background-color: light-dark(#f0f0f0, #333); 
-            }}
-            a {{ 
+            }
+            a { 
                 color: light-dark(#2980b9, #3091d1); 
                 text-decoration: none; 
-            }}
-            a:hover {{ text-decoration: underline; }}
-            .tabs {{ 
+            }
+            a:hover { text-decoration: underline; }
+            .tabs { 
                 margin: 15px 0; 
                 border-bottom: 1px solid light-dark(#ddd, #444); 
-            }}
-            .tab-button {{ 
+            }
+            .tab-button { 
                 padding: 10px 16px; 
                 margin-right: 4px; 
                 cursor: pointer; 
@@ -117,16 +120,16 @@ def generate_html_table(datasets_by_technique):
                 color: inherit; 
                 font-size: 14px; 
                 border-bottom: 3px solid transparent; 
-            }}
-            .tab-button:hover {{ 
+            }
+            .tab-button:hover { 
                 background: light-dark(#f5f5f5, #2d2d2d); 
-            }}
-            .tab-button.active {{ 
+            }
+            .tab-button.active { 
                 border-bottom-color: light-dark(#2980b9, #3091d1); 
                 font-weight: 600; 
-            }}
-            .filter-dropdown {{ position: relative; display: inline-block; }}
-            .filter-button {{ 
+            }
+            .filter-dropdown { position: relative; display: inline-block; }
+            .filter-button { 
                 cursor: pointer; 
                 padding: 4px 8px; 
                 background: light-dark(#f5f5f5, #2d2d2d); 
@@ -135,11 +138,11 @@ def generate_html_table(datasets_by_technique):
                 border-radius: 3px; 
                 margin-left: 8px; 
                 font-size: 12px; 
-            }}
-            .filter-button:hover {{ 
+            }
+            .filter-button:hover { 
                 background: light-dark(#e8e8e8, #333); 
-            }}
-            .filter-content {{ 
+            }
+            .filter-content { 
                 display: none; 
                 position: absolute; 
                 background: light-dark(white, #1e1e1e); 
@@ -151,17 +154,17 @@ def generate_html_table(datasets_by_technique):
                 overflow-y: auto; 
                 box-shadow: 0 4px 6px light-dark(rgba(0,0,0,0.1), rgba(0,0,0,0.5)); 
                 border-radius: 4px; 
-            }}
-            .filter-dropdown.active .filter-content {{ display: block; }}
-            .filter-checkbox {{ display: block; margin: 5px 0; cursor: pointer; }}
-            .manufacturer-group {{ margin: 10px 0; padding-left: 10px; }}
-            .manufacturer-label {{ font-weight: 600; margin: 8px 0 4px 0; }}
-            .detector-checkbox {{ display: block; margin: 3px 0; padding-left: 20px; }}
-            th:nth-child(5), td:nth-child(5) {{ min-width: 200px; }}
-            h1 {{ 
+            }
+            .filter-dropdown.active .filter-content { display: block; }
+            .filter-checkbox { display: block; margin: 5px 0; cursor: pointer; }
+            .manufacturer-group { margin: 10px 0; padding-left: 10px; }
+            .manufacturer-label { font-weight: 600; margin: 8px 0 4px 0; }
+            .detector-checkbox { display: block; margin: 3px 0; padding-left: 20px; }
+            th:nth-child(5), td:nth-child(5) { min-width: 200px; }
+            h1 { 
                 border-bottom: 1px solid light-dark(#ddd, #444); 
                 padding-bottom: 10px; 
-            }}
+            }
         </style>
     </head>
     <body>
@@ -200,18 +203,18 @@ def generate_html_table(datasets_by_technique):
 
     for technique in sorted(datasets_by_technique.keys()):
         for dataset in datasets_by_technique[technique]:
-            tags_str = ', '.join(dataset['tags'])
-            manufacturer = dataset.get('detector_manufacturer', 'Unknown')
-            detector = dataset.get('detector', 'Unknown')
+            tags_str = ", ".join(dataset["tags"])
+            manufacturer = dataset.get("detector_manufacturer", "Unknown")
+            detector = dataset.get("detector", "Unknown")
             detector_full = f"{manufacturer} - {detector}"
             html += f"""            <tr data-tags="{tags_str}" data-technique="{technique}" data-detector="{detector}" data-manufacturer="{manufacturer}">
                 <td>{technique}</td>
-                <td><strong>{dataset['name']}</strong></td>
-                <td>{dataset['description']}</td>
+                <td><strong>{dataset["name"]}</strong></td>
+                <td>{dataset["description"]}</td>
                 <td>{tags_str}</td>
                 <td>{detector_full}</td>
-                <td><a href="{dataset['source']}">{dataset['file']}</a></td>
-                <td>{dataset['license']}</td>
+                <td><a href="{dataset["source"]}">{dataset["file"]}</a></td>
+                <td>{dataset["license"]}</td>
             </tr>
     """
 
@@ -220,7 +223,7 @@ def generate_html_table(datasets_by_technique):
         <script>
             const techniqueTags = {technique_tags_json};
             const techniqueDetectors = {technique_detectors_json};
-            const allTags = {__import__('json').dumps(all_tags_sorted)};
+            const allTags = {__import__("json").dumps(all_tags_sorted)};
             const allDetectors = {all_detectors_json};
             let currentTechnique = 'All';
 
@@ -370,6 +373,7 @@ def generate_html_table(datasets_by_technique):
     </html>
     """
     return html
+
 
 # ---------------------------------------------------------------------------
 # Widget-styled browser for the docs landing page
@@ -704,8 +708,14 @@ _FORM_CSS = """
 
 def _esc(value) -> str:
     """Minimal HTML escaping for text baked into a page at build time."""
-    return (str(value).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-            .replace('"', "&quot;").replace("'", "&#39;"))
+    return (
+        str(value)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&#39;")
+    )
 
 
 # Top-nav destinations. Examples and API are Sphinx-generated (sphinx-gallery +
@@ -723,13 +733,13 @@ _NAV_LINKS = (
 def _top_nav(active: str = "") -> str:
     items = "".join(
         '<a class="app-navlink{cls}" href="{url}">{name}</a>'.format(
-            cls=" active" if name == active else "", url=url, name=_esc(name))
+            cls=" active" if name == active else "", url=url, name=_esc(name)
+        )
         for name, url in _NAV_LINKS
     )
     return (
         '<nav class="app-nav">'
-        '<a class="app-brand" href="index.html">EM-Database</a>'
-        + items + '</nav>'
+        '<a class="app-brand" href="index.html">EM-Database</a>' + items + "</nav>"
     )
 
 
@@ -737,8 +747,9 @@ def _load_css() -> str:
     return (Path(__file__).parent / "static" / "browser.css").read_text(encoding="utf-8")
 
 
-def _app_page(title: str, body: str, active: str = "", extra_css: str = "",
-              scripts: str = "") -> str:
+def _app_page(
+    title: str, body: str, active: str = "", extra_css: str = "", scripts: str = ""
+) -> str:
     """Wrap page ``body`` in the self-contained Catppuccin app shell.
 
     Built by concatenation (not ``str.format``/``%``) so CSS/JS braces need no
@@ -750,8 +761,7 @@ def _app_page(title: str, body: str, active: str = "", extra_css: str = "",
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         "<title>" + _esc(title) + "</title>\n"
         "<style>\n" + _load_css() + "\n" + _APP_CSS + "\n" + extra_css + "\n</style>\n"
-        "</head>\n<body>\n"
-        + _top_nav(active) + "\n" + body + "\n" + scripts + "\n"
+        "</head>\n<body>\n" + _top_nav(active) + "\n" + body + "\n" + scripts + "\n"
         "</body></html>\n"
     )
 
@@ -777,8 +787,7 @@ def _browser_script(payload, tabs) -> str:
     return (
         "<script>\n"
         "const DATA = " + json.dumps(payload) + ";\n"
-        "const TABS = " + json.dumps(tabs) + ";\n"
-        + _DOCS_BROWSER_JS + "\n</script>"
+        "const TABS = " + json.dumps(tabs) + ";\n" + _DOCS_BROWSER_JS + "\n</script>"
     )
 
 
@@ -793,12 +802,11 @@ def generate_browser_html() -> str:
         "<!doctype html>\n"
         '<html lang="en"><head><meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        "<title>EM Datasets</title>\n<style>\n"
-        + _load_css() + "\n"
+        "<title>EM Datasets</title>\n<style>\n" + _load_css() + "\n"
         "html, body { margin: 0; padding: 0; background: transparent; }\n"
-        + _BROWSER_OVERRIDES + "\n</style></head>\n<body>\n"
-        '<div id="root"></div>\n'
-        + _browser_script(payload, tabs) + "\n</body></html>\n"
+        + _BROWSER_OVERRIDES
+        + "\n</style></head>\n<body>\n"
+        '<div id="root"></div>\n' + _browser_script(payload, tabs) + "\n</body></html>\n"
     )
 
 
@@ -808,17 +816,21 @@ def generate_landing_html() -> str:
     body = (
         '<main class="app-main">'
         '<div class="app-hero">'
-        '<h1>EM-Database</h1>'
-        '<p>A curated, citable collection of electron microscopy datasets &mdash; '
-        'a couple of lines of Python from your analysis. Search below, then copy the '
-        'snippet to load one with <code>em_database.data.&lt;Name&gt;()</code>.</p>'
-        '</div>'
+        "<h1>EM-Database</h1>"
+        "<p>A curated, citable collection of electron microscopy datasets &mdash; "
+        "a couple of lines of Python from your analysis. Search below, then copy the "
+        "snippet to load one with <code>em_database.data.&lt;Name&gt;()</code>.</p>"
+        "</div>"
         '<div id="root"></div>'
-        '</main>'
+        "</main>"
     )
-    return _app_page("EM-Database", body, active="",
-                     extra_css=_BROWSER_OVERRIDES,
-                     scripts=_browser_script(payload, tabs))
+    return _app_page(
+        "EM-Database",
+        body,
+        active="",
+        extra_css=_BROWSER_OVERRIDES,
+        scripts=_browser_script(payload, tabs),
+    )
 
 
 def generate_all_data_html() -> str:
@@ -828,21 +840,32 @@ def generate_all_data_html() -> str:
         '<main class="app-main">'
         '<div class="app-hero" style="padding:18px 0 4px">'
         '<h1 style="font-size:30px">All Data</h1>'
-        '<p>Every dataset in the collection. Search across names, techniques, '
-        'authors, detectors and tags; filter by technique with the tabs.</p>'
-        '</div>'
+        "<p>Every dataset in the collection. Search across names, techniques, "
+        "authors, detectors and tags; filter by technique with the tabs.</p>"
+        "</div>"
         '<div id="root"></div>'
-        '</main>'
+        "</main>"
     )
-    return _app_page("All Data &middot; EM-Database", body, active="All Data",
-                     extra_css=_BROWSER_OVERRIDES + "\n.emdb-body { height: 620px; }\n",
-                     scripts=_browser_script(payload, tabs))
+    return _app_page(
+        "All Data &middot; EM-Database",
+        body,
+        active="All Data",
+        extra_css=_BROWSER_OVERRIDES + "\n.emdb-body { height: 620px; }\n",
+        scripts=_browser_script(payload, tabs),
+    )
 
 
 # -- Add Dataset page --------------------------------------------------------
 
-_MANUFACTURERS = ("Gatan", "Thermo Fisher Scientific", "Direct Electron",
-                  "Dectris", "Quantum Detectors", "TVIPS", "Other")
+_MANUFACTURERS = (
+    "Gatan",
+    "Thermo Fisher Scientific",
+    "Direct Electron",
+    "Dectris",
+    "Quantum Detectors",
+    "TVIPS",
+    "Other",
+)
 _VENDORS = ("Thermo Fisher Scientific", "JEOL", "Hitachi", "Zeiss", "Other")
 _TECHNIQUES = ("4D-STEM", "EELS", "EDS", "EBSD", "STEM", "In-situ TEM", "Cryo-EM", "Other")
 
@@ -857,8 +880,20 @@ def _text_field(fid, label, required=False, placeholder="", hint="", full=False)
     hn = '<div class="field-hint">' + _esc(hint) + "</div>" if hint else ""
     style = ' style="grid-column:1/-1"' if full else ""
     return (
-        '<div class="field"' + style + '><label for="' + fid + '">' + _esc(label) + req + "</label>"
-        + hn + '<input id="' + fid + '" type="text"' + ph + ">"
+        '<div class="field"'
+        + style
+        + '><label for="'
+        + fid
+        + '">'
+        + _esc(label)
+        + req
+        + "</label>"
+        + hn
+        + '<input id="'
+        + fid
+        + '" type="text"'
+        + ph
+        + ">"
         '<div class="field-err" id="err-' + fid + '"></div></div>'
     )
 
@@ -868,8 +903,17 @@ def _select_field(fid, label, options, hint=""):
     opts = '<option value="">&mdash; select &mdash;</option>'
     opts += "".join('<option value="' + _esc(o) + '">' + _esc(o) + "</option>" for o in options)
     return (
-        '<div class="field"><label for="' + fid + '">' + _esc(label) + "</label>"
-        + hn + '<select id="' + fid + '">' + opts + "</select>"
+        '<div class="field"><label for="'
+        + fid
+        + '">'
+        + _esc(label)
+        + "</label>"
+        + hn
+        + '<select id="'
+        + fid
+        + '">'
+        + opts
+        + "</select>"
         '<div class="field-err" id="err-' + fid + '"></div></div>'
     )
 
@@ -893,24 +937,39 @@ def _author_row_html():
 def generate_add_dataset_html() -> str:
     """The Add Dataset page: a schema-driven form that opens a prefilled PR."""
     fields = (
-        _text_field("f-name", "Dataset Name", required=True,
-                    placeholder="MgONanoCrystals",
-                    hint="Short CamelCase identifier - becomes the YAML key and file name.",
-                    full=True)
+        _text_field(
+            "f-name",
+            "Dataset Name",
+            required=True,
+            placeholder="MgONanoCrystals",
+            hint="Short CamelCase identifier - becomes the YAML key and file name.",
+            full=True,
+        )
         + '<div class="field" style="grid-column:1/-1"><label for="f-description">Description '
-          '<span class="req">*</span></label>'
-          '<div class="field-hint">Technique, sample, size, and anything notable.</div>'
-          '<textarea id="f-description" placeholder="A 4D-STEM dataset of ..."></textarea>'
-          '<div class="field-err" id="err-f-description"></div></div>'
-        + _text_field("f-source", "Source URL", required=True,
-                      placeholder="https://zenodo.org/records/15490547/files",
-                      hint="Direct download base (no file name).")
-        + _text_field("f-file", "File", required=True,
-                      placeholder="smallPtychography.hspy",
-                      hint="The file name at that source.")
-        + _text_field("f-checksum", "Checksum",
-                      placeholder="md5:df9376d5c020a23f0f7f51cfe79f303f",
-                      hint="md5:<32 hex chars>")
+        '<span class="req">*</span></label>'
+        '<div class="field-hint">Technique, sample, size, and anything notable.</div>'
+        '<textarea id="f-description" placeholder="A 4D-STEM dataset of ..."></textarea>'
+        '<div class="field-err" id="err-f-description"></div></div>'
+        + _text_field(
+            "f-source",
+            "Source URL",
+            required=True,
+            placeholder="https://zenodo.org/records/15490547/files",
+            hint="Direct download base (no file name).",
+        )
+        + _text_field(
+            "f-file",
+            "File",
+            required=True,
+            placeholder="smallPtychography.hspy",
+            hint="The file name at that source.",
+        )
+        + _text_field(
+            "f-checksum",
+            "Checksum",
+            placeholder="md5:df9376d5c020a23f0f7f51cfe79f303f",
+            hint="md5:<32 hex chars>",
+        )
         + _text_field("f-data_size", "Data Size", placeholder="1.4 GB")
         + _select_field("f-detector_manufacturer", "Detector Manufacturer", _MANUFACTURERS)
         + _text_field("f-detector", "Detector", placeholder="CeleritasXS")
@@ -921,8 +980,13 @@ def generate_add_dataset_html() -> str:
         + _select_field("f-technique", "Technique", _TECHNIQUES)
         + _text_field("f-license", "License", placeholder="CC-BY-4.0")
         + _text_field("f-doi", "DOI", placeholder="10.5281/zenodo.15490547")
-        + _text_field("f-tags", "Tags", placeholder="Orientation Mapping, Nanocrystals",
-                      hint="Comma-separated.", full=True)
+        + _text_field(
+            "f-tags",
+            "Tags",
+            placeholder="Orientation Mapping, Nanocrystals",
+            hint="Comma-separated.",
+            full=True,
+        )
     )
 
     issue_url = "https://github.com/" + _REPO + "/issues/new?template=new_dataset.yaml"
@@ -931,41 +995,47 @@ def generate_add_dataset_html() -> str:
         '<main class="app-main">'
         '<div class="app-hero" style="padding:24px 0 6px">'
         '<h1 style="font-size:32px">Add a Dataset</h1>'
-        '<p>Fill in the metadata; the YAML builds live on the right. '
-        '&ldquo;Open a Pull Request&rdquo; sends you to GitHub with the new file '
-        'pre-filled &mdash; commit it to a branch there and GitHub opens the PR.</p>'
-        '</div>'
+        "<p>Fill in the metadata; the YAML builds live on the right. "
+        "&ldquo;Open a Pull Request&rdquo; sends you to GitHub with the new file "
+        "pre-filled &mdash; commit it to a branch there and GitHub opens the PR.</p>"
+        "</div>"
         '<div class="form-wrap">'
         '<form id="ds-form" class="ds-form" autocomplete="off">'
-        '<div class="grid2">' + fields + '</div>'
+        '<div class="grid2">' + fields + "</div>"
         '<div class="section-title">Authors</div>'
-        '<div id="authors">' + _author_row_html() + '</div>'
+        '<div id="authors">' + _author_row_html() + "</div>"
         '<button type="button" id="add-author" class="btn-ghost">+ Add author</button>'
-        '</form>'
+        "</form>"
         '<aside class="yaml-side">'
         '<div class="yaml-head"><span>Generated YAML</span>'
         '<button type="button" id="copy-yaml" class="copy-mini">Copy</button></div>'
         '<pre id="yaml-preview" class="yaml-pre"><code></code></pre>'
         '<div class="submit-row">'
         '<button type="button" id="submit-pr" class="btn-primary" disabled>'
-        'Open a Pull Request on GitHub &#8599;</button>'
+        "Open a Pull Request on GitHub &#8599;</button>"
         '<a id="submit-issue" class="btn-secondary" target="_blank" rel="noopener" href="'
-        + issue_url + '">Submit as an issue instead</a>'
-        '</div>'
+        + issue_url
+        + '">Submit as an issue instead</a>'
+        "</div>"
         '<p class="form-note">Requires a GitHub account. The button opens GitHub&rsquo;s '
-        '&ldquo;create new file&rdquo; page pre-filled at '
-        '<code>em_database/datasets/&lt;Name&gt;.yaml</code>; if you cannot push to the '
-        'repo, GitHub forks it for you and lets you propose the change. Fields marked '
+        "&ldquo;create new file&rdquo; page pre-filled at "
+        "<code>em_database/datasets/&lt;Name&gt;.yaml</code>; if you cannot push to the "
+        "repo, GitHub forks it for you and lets you propose the change. Fields marked "
         '<span class="req">*</span> are required.</p>'
-        '</aside>'
-        '</div>'
-        '</main>'
+        "</aside>"
+        "</div>"
+        "</main>"
     )
 
     js = _ADD_DATASET_JS.replace("__REPO__", _REPO).replace("__BRANCH__", _BRANCH)
     scripts = "<script>\n" + js + "\n</script>"
-    return _app_page("Add Dataset &middot; EM-Database", body, active="Add Dataset",
-                     extra_css=_FORM_CSS, scripts=scripts)
+    return _app_page(
+        "Add Dataset &middot; EM-Database",
+        body,
+        active="Add Dataset",
+        extra_css=_FORM_CSS,
+        scripts=scripts,
+    )
 
 
 _ADD_DATASET_JS = r"""

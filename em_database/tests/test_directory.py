@@ -4,7 +4,7 @@ These exercise where files land, not what is in them, so they use the smallest
 dataset in the index rather than a large one.
 """
 
-import os
+from pathlib import Path
 
 import pytest
 
@@ -12,7 +12,7 @@ import em_database
 from em_database import data
 from em_database.tests.test_load_data import TINY_DATASET
 
-DEFAULT_DIR = os.path.join(os.path.expanduser("~"), "em_database")
+DEFAULT_DIR = Path.home() / "em_database"
 
 
 @pytest.fixture(autouse=True)
@@ -26,9 +26,14 @@ def test_get_data_dir():
     assert em_database.get_data_dir() == DEFAULT_DIR
 
 
+def test_reset_data_dir_returns_to_the_default():
+    em_database.reset_data_dir()
+    assert em_database.get_data_dir() == DEFAULT_DIR
+
+
 def test_set_data_dir(tmp_path):
     em_database.set_data_dir(str(tmp_path))
-    assert em_database.get_data_dir() == str(tmp_path)
+    assert em_database.get_data_dir() == tmp_path
 
 
 def test_reset_data_dir(tmp_path):
@@ -42,7 +47,7 @@ def test_saving_to_configured_dir(tmp_path):
     em_database.set_data_dir(str(tmp_path))
     dataset = getattr(data, TINY_DATASET)()
     dest = dataset.download(progressbar=False, background=False)
-    assert os.path.exists(os.path.join(str(tmp_path), dataset.file))
+    assert (tmp_path / dataset.file).exists()
     # a second download must reuse the file rather than refetch it
     assert dataset.download(progressbar=False, background=False) == dest
 
@@ -53,7 +58,7 @@ def test_saving_to_explicit_dir(tmp_path):
     em_database.set_data_dir(str(tmp_path / "configured"))
     dataset = getattr(data, TINY_DATASET)()
     dest = dataset.download(destination=str(other), progressbar=False, background=False)
-    assert "elsewhere" in dest
+    assert "elsewhere" in str(dest)
     assert (other / dataset.file).exists()
 
 
@@ -63,4 +68,4 @@ def test_filepath_reports_missing_and_present(tmp_path):
     dataset = getattr(data, TINY_DATASET)()
     assert dataset.filepath() is None
     dataset.download(progressbar=False, background=False)
-    assert dataset.filepath() == os.path.join(str(tmp_path), dataset.file)
+    assert dataset.filepath() == tmp_path / dataset.file

@@ -5,35 +5,39 @@ This is the data model behind :func:`em_database.browse`: it turns the
 marked downloaded or not, each carrying the metadata a user hovers to read. It
 downloads nothing and opens no files, so it is cheap enough to rebuild on every
 render (the one thing that changes underfoot is which files are on disk, which
-is a single ``os.path.exists`` per dataset).
+is a single ``Path.exists`` per dataset).
 """
+
 from __future__ import annotations
 
 import inspect
-from typing import Any, Optional
+from pathlib import Path
 
+from em_database.downloadable_dataset import DownloadableDataset
 
 # Techniques in the order the browser should show them - the modalities the
 # collection is built around first, then anything else alphabetically.
 TECHNIQUE_ORDER = ("4D-STEM", "EELS", "EDS", "EBSD", "STEM", "In-situ TEM", "Cryo-EM")
 
 
-def datasets() -> list[tuple[str, Any]]:
+def datasets() -> list[tuple[str, DownloadableDataset]]:
     """``(name, dataset)`` for every dataset ``em_database.data`` exposes.
 
     Filtered by ``issubclass`` so the base class and incidental imports in the
     module namespace stay out; sorted by name for a stable order.
     """
     import em_database.data as data
-    from em_database.downloadable_dataset import DownloadableDataset
 
-    out: list[tuple[str, Any]] = []
+    out: list[tuple[str, DownloadableDataset]] = []
     for name in getattr(data, "__all__", None) or dir(data):
         if name.startswith("_"):
             continue
         obj = getattr(data, name, None)
-        if (not inspect.isclass(obj) or obj is DownloadableDataset
-                or not issubclass(obj, DownloadableDataset)):
+        if (
+            not inspect.isclass(obj)
+            or obj is DownloadableDataset
+            or not issubclass(obj, DownloadableDataset)
+        ):
             continue
         try:
             out.append((name, obj()))
@@ -42,12 +46,14 @@ def datasets() -> list[tuple[str, Any]]:
     return sorted(out, key=lambda kv: kv[0].lower())
 
 
-def resolve(name: str):
+def resolve(name: str) -> DownloadableDataset | None:
     """The dataset instance for a catalogue name, or ``None``."""
     import em_database.data as data
 
     obj = getattr(data, str(name), None)
-    return obj() if inspect.isclass(obj) else None
+    if not inspect.isclass(obj) or not issubclass(obj, DownloadableDataset):
+        return None
+    return obj()
 
 
 def _technique(ds) -> str:
@@ -59,7 +65,7 @@ def _join(*parts) -> str:
     return " ".join(str(p).strip() for p in parts if p and str(p).strip())
 
 
-def _declared_shape(ds) -> Optional[str]:
+def _declared_shape(ds) -> str | None:
     """The shape em-database declares in the dataset's YAML, if it does.
 
     Only declared shapes are used - reading it out of a downloaded file would
@@ -92,7 +98,18 @@ def _authors(md) -> tuple[list[str], list[str]]:
     return [str(a) for a in (authors or [])], []
 
 
-def entry(name: str, ds) -> dict:
+def _location(path: Path | None) -> str | None:
+    """Which data directory a downloaded file came from: "shared" or "user"."""
+    if path is None:
+        return None
+    from em_database import config
+
+    parent = path.resolve().parent
+    shared = {d.resolve() for d in config.shared_data_dirs()}
+    return "shared" if parent in shared else "user"
+
+
+def entry(name: str, ds: DownloadableDataset) -> dict:
     """One catalogue row - everything the browser draws for a dataset."""
     md = getattr(ds, "metadata", None) or {}
     try:
@@ -105,8 +122,9 @@ def entry(name: str, ds) -> dict:
         "technique": _technique(ds),
         "size": str(getattr(ds, "data_size", "") or ""),
         "shape": _declared_shape(ds),
-        "downloaded": bool(path),
-        "path": path or "",
+        "downloaded": path is not None,
+        "location": _location(path),
+        "path": str(path) if path else "",
         "description": str(getattr(ds, "description", "") or ""),
         "detector": _join(getattr(ds, "detector_manufacturer", ""), getattr(ds, "detector", "")),
         "microscope": _join(md.get("microscope_vendor"), md.get("microscope_model")),
@@ -122,10 +140,19 @@ def entry(name: str, ds) -> dict:
     # "Carter Francis" (an author) or "Direct Electron" (an affiliation) finds
     # every dataset it touches - not just the name.
     searchable = [
-        name, row["technique"], row["description"], row["detector"],
-        row["microscope"], row["voltage"], row["license"], row["doi"],
-        row["file"], row["shape"] or "", " ".join(row["tags"]),
-        " ".join(names), " ".join(affiliations),
+        name,
+        row["technique"],
+        row["description"],
+        row["detector"],
+        row["microscope"],
+        row["voltage"],
+        row["license"],
+        row["doi"],
+        row["file"],
+        row["shape"] or "",
+        " ".join(row["tags"]),
+        " ".join(names),
+        " ".join(affiliations),
     ]
     row["search"] = " ".join(str(s) for s in searchable if s).lower()
     return row

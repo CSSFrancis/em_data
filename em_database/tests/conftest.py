@@ -4,6 +4,7 @@ Every test runs against an isolated, empty settings file (in a tmp dir) and with
 the legacy ``EM_DATABASE_DATA_DIR`` env var cleared, so the developer's real
 settings never affect a test and a test never writes to the real config.
 """
+
 import pytest
 
 

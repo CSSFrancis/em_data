@@ -124,6 +124,11 @@ function render({ model, el: root }) {
     const status = el("div", "emdb-d-status");
     if (downloading) {
       status.appendChild(el("span", "emdb-d-badge", "downloading…"));
+    } else if (it.downloaded && it.location === "shared") {
+      const badge = el("span", "emdb-d-badge shared", "● shared");
+      badge.title = "installed system-wide: " + it.path;
+      status.appendChild(badge);
+      status.appendChild(el("span", "emdb-d-note", "installed for every user, not yours to delete"));
     } else if (it.downloaded) {
       status.appendChild(el("span", "emdb-d-badge on", "● downloaded"));
       const del = el("button", "emdb-delete", "Delete");

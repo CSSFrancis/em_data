@@ -204,8 +204,9 @@ function render({ model, el: root }) {
     const isActive = active.has(item.name);
     const row = el("div", "emdb-row" + (state.selected === item.name ? " selected" : ""));
     const meta = [item.size, item.shape].filter(Boolean).join("  ·  ");
-    row.appendChild(el("span", "emdb-glyph " + (item.downloaded ? "on" : "off"),
-      item.downloaded ? "●" : "○"));
+    const glyph = el("span", "emdb-glyph " + glyphClass(item), item.downloaded ? "●" : "○");
+    if (item.location === "shared") glyph.title = "installed system-wide: " + item.path;
+    row.appendChild(glyph);
     row.appendChild(el("span", "emdb-name", esc(item.name)));
     row.appendChild(el("span", "emdb-meta", esc(meta)));
     row.appendChild(drawAction(item, isActive));
@@ -213,6 +214,11 @@ function render({ model, el: root }) {
     row.addEventListener("mouseenter", () => { state.hovered = item.name; drawDetails(); });
     row.addEventListener("click", () => { state.selected = item.name; drawList(); });
     return row;
+  }
+
+  function glyphClass(item) {
+    if (!item.downloaded) return "off";
+    return item.location === "shared" ? "shared" : "on";
   }
 
   function drawAction(item, isActive) {
@@ -251,7 +257,12 @@ function render({ model, el: root }) {
 
     // status / action line
     const statusRow = el("div", "emdb-d-status");
-    if (item.downloaded) {
+    if (item.downloaded && item.location === "shared") {
+      const badge = el("span", "emdb-d-badge shared", "● shared");
+      badge.title = "installed system-wide: " + item.path;
+      statusRow.appendChild(badge);
+      statusRow.appendChild(el("span", "emdb-d-note", "installed for every user, not yours to delete"));
+    } else if (item.downloaded) {
       statusRow.appendChild(el("span", "emdb-d-badge on", "● downloaded"));
       const del = el("button", "emdb-delete", "Delete");
       del.title = "Remove the downloaded file from disk";
