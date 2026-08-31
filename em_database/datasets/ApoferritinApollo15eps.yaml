@@ -10,7 +10,7 @@ ApoferritinApollo15eps:
   source: https://zenodo.org/records/21632101/files
   checksum: md5:ce63b6d28567b6a74b8c12712b6dab21
   file: ApoferritinApollo15eps.zspy
-  data_size: 483.0 MB
+  size_bytes: 483010772
   detector_manufacturer: Direct Electron
   detector: Apollo
   license: CC0-1.0

@@ -1,0 +1,29 @@
+name: check sources
+
+# Every dataset's source URL, checked against the server. This is what rots over
+# time - a Zenodo record superseded, a GitHub ref rewritten - and it is invisible
+# until someone tries to download. It is one HEAD request per dataset, so it runs
+# weekly rather than on the six-way matrix of every push.
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  sources:
+    name: source URLs still resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies and package
+        run: pip install -U -e .'[dev]'
+
+      - name: Check every source URL
+        run: pytest -m network -v

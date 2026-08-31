@@ -17,6 +17,9 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install dependencies and package
+        run: pip install -U -e .'[dev]'
+
       - name: Extract issue body
         run: echo "${{ github.event.issue.body }}" > issue_body.txt
 

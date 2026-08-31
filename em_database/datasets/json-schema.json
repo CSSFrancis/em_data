@@ -14,50 +14,30 @@
           "type": "string",
           "format": "uri"
         },
+        "file": {
+          "type": "string"
+        },
         "checksum": {
           "type": "string",
           "pattern": "^md5:[A-Fa-f0-9]{32}$"
         },
-        "file": {
-          "type": "string"
-        },
-        "data_size": {
-          "type": "string"
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
         },
         "detector_manufacturer": {
-          "type": "string",
-          "options": {
-            "enum": [
-              "Gatan",
-              "Thermo Fisher Scientific",
-              "Direct Electron",
-              "Dectris",
-              "Quantum Detectors",
-              "TVIPS",
-              "Other"
-            ]
-          }
+          "type": "string"
         },
         "detector": {
           "type": "string"
         },
         "microscope_vendor": {
-          "type": "string",
-          "enum": [
-            "Thermo Fisher Scientific",
-            "JEOL",
-            "Hitachi",
-            "Zeiss",
-            "Other"
-          ]
+          "type": "string"
         },
         "microscope_model": {
           "type": "string"
         },
         "camera_length": {
-          "type": "string"
-        },
-        "folder": {
           "type": "string"
         },
         "voltage": {

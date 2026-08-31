@@ -11,7 +11,7 @@ AmorphousFilm4nm4DSTEM:
   source: https://zenodo.org/records/21632101/files
   checksum: md5:eaa809326d134e73b2c96e6ad4a85b6a
   file: AmorphousFilm4nm4DSTEM.zspy
-  data_size: 1.10 GB
+  size_bytes: 1104287335
   detector_manufacturer: Direct Electron
   detector: CeleritasXS
   license: CC-BY-4.0

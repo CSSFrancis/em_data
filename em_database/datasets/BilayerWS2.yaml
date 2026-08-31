@@ -4,7 +4,7 @@ BilayerWS2:
   source: https://zenodo.org/records/15490547/files
   checksum: md5:df9376d5c020a23f0f7f51cfe79f303f
   file: smallPtychography.hspy
-  data_size: 12.5 MB
+  size_bytes: 12492298
   detector_manufacturer: Direct Electron
   detector: CeleritasXS
   microscope_vendor: Thermo Fisher Scientific

@@ -4,7 +4,7 @@ AlNanocrystals:
   source: https://zenodo.org/records/15490547/files
   checksum: md5:25901cc272da7d69859f520985230e98
   file: AlNanocrystalsSmaller.zspy
-  data_size: 1.4 GB
+  size_bytes: 1381831542
   detector_manufacturer: Direct Electron
   detector: CeleritasXS
   microscope_vendor: Thermo Fisher Scientific

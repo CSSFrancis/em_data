@@ -4,7 +4,7 @@ SPEDAg:
   source: https://zenodo.org/records/15490547/files
   checksum: md5:8556346543fc19f0ef9bdc0f4a6619b5
   file: SPED-Ag.zspy
-  data_size: 214.0 MB
+  size_bytes: 213985149
   detector_manufacturer: Quantum Detectors
   detector: Merlin
   microscope_vendor: JEOL

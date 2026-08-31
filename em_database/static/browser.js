@@ -126,6 +126,8 @@ function render({ model, el: root }) {
     // `item.search` is a lowercased blob of every field (name, description,
     // detector, microscope, tags, authors + affiliations, license, …), so a
     // query like "Carter Francis" matches on author, not just the name.
+    // em_database.search() matches this same blob by this same rule; matching
+    // stays here rather than in the kernel so typing never waits on a round trip.
     const blob = item.search || item.name.toLowerCase();
     return state.search.toLowerCase().split(/\s+/).every((term) => blob.includes(term));
   }
@@ -204,8 +206,9 @@ function render({ model, el: root }) {
     const isActive = active.has(item.name);
     const row = el("div", "emdb-row" + (state.selected === item.name ? " selected" : ""));
     const meta = [item.size, item.shape].filter(Boolean).join("  ·  ");
-    row.appendChild(el("span", "emdb-glyph " + (item.downloaded ? "on" : "off"),
-      item.downloaded ? "●" : "○"));
+    const glyph = el("span", "emdb-glyph " + glyphClass(item), item.downloaded ? "●" : "○");
+    if (item.location === "shared") glyph.title = sharedTitle(item);
+    row.appendChild(glyph);
     row.appendChild(el("span", "emdb-name", esc(item.name)));
     row.appendChild(el("span", "emdb-meta", esc(meta)));
     row.appendChild(drawAction(item, isActive));
@@ -213,6 +216,18 @@ function render({ model, el: root }) {
     row.addEventListener("mouseenter", () => { state.hovered = item.name; drawDetails(); });
     row.addEventListener("click", () => { state.selected = item.name; drawList(); });
     return row;
+  }
+
+  // A shared copy and your own can both exist; the tooltip names each.
+  function sharedTitle(item) {
+    const lines = ["installed system-wide: " + item.path];
+    if (item.user_path) lines.push("your copy: " + item.user_path);
+    return lines.join("\n");
+  }
+
+  function glyphClass(item) {
+    if (!item.downloaded) return "off";
+    return item.location === "shared" ? "shared" : "on";
   }
 
   function drawAction(item, isActive) {
@@ -251,7 +266,17 @@ function render({ model, el: root }) {
 
     // status / action line
     const statusRow = el("div", "emdb-d-status");
-    if (item.downloaded) {
+    if (item.downloaded && item.location === "shared") {
+      const badge = el("span", "emdb-d-badge shared", item.user_path ? "● shared + yours" : "● shared");
+      badge.title = sharedTitle(item);
+      statusRow.appendChild(badge);
+      if (item.user_path) {
+        const del = el("button", "emdb-delete", "Delete yours");
+        del.title = "Remove your copy (" + item.user_path + "). The shared one stays.";
+        del.addEventListener("click", () => cmd("delete", { name: item.name }));
+        statusRow.appendChild(del);
+      }
+    } else if (item.downloaded) {
       statusRow.appendChild(el("span", "emdb-d-badge on", "● downloaded"));
       const del = el("button", "emdb-delete", "Delete");
       del.title = "Remove the downloaded file from disk";

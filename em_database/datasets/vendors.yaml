@@ -1,0 +1,14 @@
+microscope_vendor:
+  - Hitachi
+  - JEOL
+  - Thermo Fisher Scientific
+  - Zeiss
+detector_manufacturer:
+  - Allied Vision
+  - Dectris
+  - Direct Electron
+  - Gatan
+  - NORDIF
+  - Quantum Detectors
+  - Thermo Fisher Scientific
+  - TVIPS

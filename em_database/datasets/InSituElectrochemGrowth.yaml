@@ -8,7 +8,7 @@ InSituElectrochemGrowth:
   source: https://zenodo.org/records/21632101/files
   checksum: md5:5f509bbecb7913387d2897bb01f66229
   file: InSituElectrochemGrowth.zspy
-  data_size: 2.44 GB
+  size_bytes: 2443313730
   detector_manufacturer: Direct Electron
   detector: DE-Artemis
   voltage: 300 kV

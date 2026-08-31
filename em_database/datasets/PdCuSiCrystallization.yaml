@@ -12,7 +12,7 @@ PdCuSiCrystallization:
   source: https://zenodo.org/records/15490547/files
   checksum: md5:80ec7f95ec250106c586debf5d814325
   file: PdCuSiCrystalization-zip.zspy
-  data_size: 5.75 GB
+  size_bytes: 5748299565
   detector_manufacturer: Direct Electron
   detector: CeleritasXS
   voltage: 200 kV

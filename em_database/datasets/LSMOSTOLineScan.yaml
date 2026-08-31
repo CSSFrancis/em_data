@@ -12,7 +12,7 @@ LSMOSTOLineScan:
   source: https://raw.githubusercontent.com/hyperspy/exspy-demos/927d1f21b3b8aba4e2e622c2e621d3d9d5542d1c/EELS/datasets
   checksum: md5:de31f7d7dc222727fac6e5ba92cac825
   file: LSMO_STO_linescan.hspy
-  data_size: 42.5 kB
+  size_bytes: 42538
   detector_manufacturer: Gatan
   detector: Quantum ER
   microscope_vendor: JEOL

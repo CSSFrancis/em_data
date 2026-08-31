@@ -9,6 +9,33 @@ env:
   MPLBACKEND: agg
 
 jobs:
+  lint:
+    name: lint and type check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies and package
+        run: pip install -U -e .'[dev]'
+
+      - name: ruff check
+        run: ruff check --output-format=github .
+
+      - name: ruff format
+        run: ruff format --check --diff .
+
+      - name: basedpyright
+        run: basedpyright
+
+      - name: dataset stub is current
+        run: python -m em_database._create_stubs --check
+
   build-with-pip:
     name: ${{ matrix.os }}-py${{ matrix.python-version }}${{ matrix.LABEL }}
     runs-on: ${{ matrix.os }}

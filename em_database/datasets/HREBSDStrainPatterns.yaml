@@ -10,7 +10,7 @@ HREBSDStrainPatterns:
   source: https://zenodo.org/records/21632101/files
   checksum: md5:76ad1ba1c0730faf629f03785d49ecd9
   file: HREBSDStrainPatterns.zspy
-  data_size: 1.28 GB
+  size_bytes: 1280664400
   detector_manufacturer: Direct Electron
   detector: DE-Meridian
   license: CC-BY-4.0

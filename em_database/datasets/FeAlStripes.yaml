@@ -4,7 +4,7 @@ FeAlStripes:
   source: https://zenodo.org/records/15490547/files
   checksum: md5:702cb0c8ff75062c0cb23b3722c2f859
   file: FeAl_stripes.zspy
-  data_size: 382.1 MB
+  size_bytes: 382141850
   detector_manufacturer: Quantum Detectors
   detector: Merlin
   microscope_vendor: JEOL

@@ -5,14 +5,15 @@
 
 import sys
 from pathlib import Path
+
 # Import and run the build script
 from em_database._build_docs import (
-    parse_datasets,
-    generate_html_table,
-    generate_browser_html,
-    generate_landing_html,
-    generate_all_data_html,
     generate_add_dataset_html,
+    generate_all_data_html,
+    generate_browser_html,
+    generate_html_table,
+    generate_landing_html,
+    parse_datasets,
 )
 
 # Add project root to path
@@ -21,10 +22,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'em_database'
-copyright = '2026, Carter Francis'
-author = 'Carter Francis'
-release = '0.4.0'
+project = "em_database"
+copyright = "2026, Carter Francis"
+author = "Carter Francis"
+release = "0.4.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -35,15 +36,14 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery",
-    'sphinx_design',
+    "sphinx_design",
 ]
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 # intro.rst / datasets.rst are superseded by the generated landing + All Data
 # app pages; keep the files but leave them out of the build so they don't warn
 # about being orphaned.
-exclude_patterns = ['intro.rst', 'datasets.rst']
-
+exclude_patterns = ["intro.rst", "datasets.rst"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -87,17 +87,18 @@ html_theme_options = {
 # No left sidebar anywhere - keep every page a single, full-width column.
 html_sidebars = {"**": []}
 _unused_sidebars = {
-  "index": [],
-  "all_data": [],
-  "add_dataset": [],
-  "datasets": [],
+    "index": [],
+    "all_data": [],
+    "add_dataset": [],
+    "datasets": [],
 }
+
 
 def build_datasets_html(app, exception):
     """Generate datasets.html during Sphinx build"""
     if exception is not None:
         print(f"Build exception: {exception}")
-    datasets_path = Path(__file__).parent.parent.parent / 'em_database' / 'datasets'
+    datasets_path = Path(__file__).parent.parent.parent / "em_database" / "datasets"
     print(f"Looking for datasets at: {datasets_path.absolute()}")
     print(f"Path exists: {datasets_path.exists()}")
     if datasets_path.exists():
@@ -107,9 +108,9 @@ def build_datasets_html(app, exception):
     print(datasets)
     html_output = generate_html_table(datasets)
 
-    output_path = Path(app.outdir) / 'datasets_db.html'
+    output_path = Path(app.outdir) / "datasets_db.html"
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open('w', encoding='utf-8') as f:
+    with output_path.open("w", encoding="utf-8") as f:
         f.write(html_output)
 
     # Generated, self-contained Catppuccin "app" pages. Each is written into the
@@ -118,20 +119,22 @@ def build_datasets_html(app, exception):
     # em_database.browse(). Each is guarded so a failure never kills the build.
     outdir = Path(app.outdir)
     pages = {
-        'index.html': generate_landing_html,
-        'all_data.html': generate_all_data_html,
-        'add_dataset.html': generate_add_dataset_html,
-        'datasets_browser.html': generate_browser_html,
+        "index.html": generate_landing_html,
+        "all_data.html": generate_all_data_html,
+        "add_dataset.html": generate_add_dataset_html,
+        "datasets_browser.html": generate_browser_html,
     }
     for filename, generator in pages.items():
         try:
-            (outdir / filename).write_text(generator(), encoding='utf-8')
+            (outdir / filename).write_text(generator(), encoding="utf-8")
             print(f"Wrote {filename}")
         except Exception as e:  # pragma: no cover - keep the build alive
             print(f"Could not build {filename}: {e}")
 
+
 def setup(app):
-    app.connect('build-finished', build_datasets_html)
+    app.connect("build-finished", build_datasets_html)
+
 
 # sphinx_gallery
 # --------------

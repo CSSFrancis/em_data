@@ -12,7 +12,7 @@ CuZnEELSMapping:
   source: https://raw.githubusercontent.com/hyperspy/exspy-demos/927d1f21b3b8aba4e2e622c2e621d3d9d5542d1c/EELS/datasets
   checksum: md5:fe46eb743e213eef7179538242b1f121
   file: CuZn_EELS_mapping_tutorial.hspy
-  data_size: 466.1 kB
+  size_bytes: 466089
   detector_manufacturer: Gatan
   detector: GIF Quantum ER
   microscope_vendor: JEOL

@@ -10,11 +10,13 @@ anywidget is an optional dependency; :func:`browse` raises a helpful error if it
 is not installed. Importing this module never imports anywidget at module load,
 so ``import em_database`` stays cheap and dependency-light.
 """
+
 from __future__ import annotations
 
 import itertools
 import threading
 import time
+import warnings
 from pathlib import Path
 
 from em_database import catalogue as _catalogue
@@ -41,7 +43,9 @@ def _quiet_pooch():
         return
     try:
         import logging
+
         import pooch
+
         pooch.get_logger().setLevel(logging.WARNING)
         _pooch_quieted = True
     except Exception:
@@ -60,7 +64,8 @@ def _enable_colab_widgets():
     if _colab_enabled:
         return
     try:
-        from google.colab import output  # importable only on Colab
+        from google.colab import output  # pyright: ignore[reportMissingImports]
+
         output.enable_custom_widget_manager()
     except Exception:
         pass
@@ -204,8 +209,8 @@ def _make_browser_class():
             if ds is not None:
                 try:
                     ds.delete()
-                except Exception:
-                    pass
+                except OSError as error:  # read-only dir, permissions, a vanished file
+                    warnings.warn(f"could not delete {name}: {error}", stacklevel=2)
                 self.refresh()
 
         # -- downloads ------------------------------------------------------
@@ -222,12 +227,8 @@ def _make_browser_class():
             # and it also covers the cached case where no bytes ever flow.
             self._set_progress(token, name, 0, 0)
             monitor = _WidgetProgress(self, token, name, cancel)
-            future = _get_executor().submit(
-                ds.download, progressbar=monitor, background=False
-            )
-            future.add_done_callback(
-                lambda f, tk=token, nm=name: self._finish_download(tk, nm, f)
-            )
+            future = _get_executor().submit(ds.download, progressbar=monitor, background=False)
+            future.add_done_callback(lambda f, tk=token, nm=name: self._finish_download(tk, nm, f))
             return future
 
         def _finish_download(self, token, name, future):
@@ -281,7 +282,7 @@ def _make_card_class():
         _esm = _STATIC / "card.js"
         _css = _STATIC / "browser.css"
 
-        info = traitlets.Dict().tag(sync=True)      # the catalogue entry() dict
+        info = traitlets.Dict().tag(sync=True)  # the catalogue entry() dict
         download = traitlets.Dict().tag(sync=True)  # {label, done, total} | {} | {error}
         _command = traitlets.Dict().tag(sync=True)
 
@@ -397,6 +398,7 @@ def browse(**kwargs):
 # Global toasts: a bare ``ds.download()`` in Jupyter pops a cancelable toast
 # ---------------------------------------------------------------------------
 
+
 def _make_settings_class():
     """Build the ``SettingsWidget`` class, importing anywidget lazily."""
     import anywidget
@@ -423,10 +425,10 @@ def _make_settings_class():
             self.observe(self._on_command, names="_command")
 
         def _refresh(self, status=""):
-            self.data_dir = config.data_dir()
-            self.default_dir = config._default_data_dir()
+            self.data_dir = str(config.data_dir())
+            self.default_dir = str(config._default_data_dir())
             self.config_path = str(config.config_path())
-            self.search_dirs = list(config.data_search_dirs())
+            self.search_dirs = [str(d) for d in config.data_search_dirs()]
             self.status = status
 
         def _on_command(self, change):
@@ -552,7 +554,8 @@ def _in_notebook():
     """True in a notebook frontend that can render widgets (Jupyter, Colab,
     VS Code, ...), False in plain Python or a terminal IPython."""
     try:
-        from IPython import get_ipython
+        from IPython.core.getipython import get_ipython
+
         ip = get_ipython()
         if ip is None:
             return False
@@ -583,6 +586,7 @@ def _get_toasts():
         if _toasts is None:
             _toasts = _toasts_class()
         from IPython.display import display
+
         display(_toasts)
     except Exception:
         return None
